@@ -693,7 +693,7 @@
       <div class="topbar-user">
         <div class="topbar-greeting">
           <div class="topbar-greeting-name" id="topbarName">—</div>
-          <div class="topbar-greeting-sub">Athlete SUBX</div>
+          <div class="topbar-greeting-sub" id="topbarRole">Athlète SUBX</div>
         </div>
         <div class="topbar-avatar" id="topbarAvatar">?</div>
       </div>
@@ -819,6 +819,13 @@
               <input type="text" id="fieldCity" placeholder="Paris">
             </div>
             <div class="form-field">
+              <label>Rôle</label>
+              <select id="fieldRole">
+                <option value="athlete">🏃 Athlète</option>
+                <option value="organizer">🎯 Organisateur</option>
+              </select>
+            </div>
+            <div class="form-field full">
               <label>Discipline préférée</label>
               <select id="fieldDiscipline">
                 <option value="">Sélectionner...</option>
@@ -967,7 +974,11 @@
           document.getElementById('fieldLastName').value = parts.slice(1).join(' ') || '';
         }
         if (data.city) document.getElementById('fieldCity').value = data.city;
-        if (data.discipline) document.getElementById('fieldDiscipline').value = data.discipline;
+        if (data.role) {
+          document.getElementById('fieldRole').value = data.role;
+          updateRoleBadge(data.role);
+        }
+        if (data.preferred_discipline) document.getElementById('fieldDiscipline').value = data.preferred_discipline;
       }
     }
 
@@ -1009,7 +1020,8 @@
       const firstName = document.getElementById('fieldFirstName').value.trim();
       const lastName = document.getElementById('fieldLastName').value.trim();
       const city = document.getElementById('fieldCity').value.trim();
-      const discipline = document.getElementById('fieldDiscipline').value;
+      const role = document.getElementById('fieldRole').value;
+      const preferred_discipline = document.getElementById('fieldDiscipline').value;
       const fullName = [firstName, lastName].filter(Boolean).join(' ');
 
       const { error } = await sb.from('profiles').upsert({
@@ -1017,7 +1029,8 @@
         full_name: fullName,
         email: currentUser.email,
         city,
-        discipline,
+        role,
+        preferred_discipline,
         updated_at: new Date().toISOString()
       });
 
@@ -1027,6 +1040,7 @@
       const msg = document.getElementById('saveMsg');
       if (!error) {
         msg.style.display = 'block';
+        updateRoleBadge(role);
         if (fullName) {
           document.getElementById('profileName').textContent = fullName;
           document.getElementById('welcomeName').textContent = firstName || fullName;
@@ -1061,6 +1075,12 @@
       } else {
         msg.textContent = '✗ ' + error.message; msg.style.color = '#ff6b6b'; msg.style.display = 'block';
       }
+    }
+
+    // ===== ROLE BADGE =====
+    function updateRoleBadge(role) {
+      const el = document.getElementById('topbarRole');
+      el.textContent = role === 'organizer' ? 'Organisateur SUBX' : 'Athlète SUBX';
     }
 
     // ===== LOGOUT =====

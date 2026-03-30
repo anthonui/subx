@@ -1133,6 +1133,8 @@
 
       const msg = document.getElementById('saveMsg');
       if (!error) {
+        msg.textContent = '✓ Profil mis à jour avec succès';
+        msg.style.color = 'var(--green)';
         msg.style.display = 'block';
         updateRoleBadge(role);
         if (fullName) {

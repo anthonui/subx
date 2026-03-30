@@ -150,6 +150,42 @@
 
     .navbar-icon:hover { color: var(--green); }
 
+    .navbar-avatar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .navbar-avatar.visible { display: flex; }
+
+    .navbar-avatar-img {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--green);
+    }
+
+    .navbar-avatar-initials {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
     .hamburger {
       display: none;
       background: none;
@@ -1238,8 +1274,11 @@
         <button class="navbar-icon" aria-label="Panier">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         </button>
-        <button class="navbar-icon" aria-label="Profil">
+        <button class="navbar-icon" id="btnProfil" aria-label="Profil">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+        <button class="navbar-avatar" id="navAvatar" aria-label="Mon profil" onclick="window.location.href='profil.html'">
+          <div class="navbar-avatar-initials" id="navAvatarInitials"></div>
         </button>
       </div>
 
@@ -1673,19 +1712,45 @@
         initScrollAnimations();
       });
 
-      // ===== PROFIL BUTTON =====
-      const profileBtn = document.querySelector('.navbar-icon[aria-label="Profil"]');
-      if (profileBtn) {
-        profileBtn.addEventListener('click', async () => {
-          const { data: { session } } = await sb.auth.getSession();
-          if (session) {
-            window.location.href = 'profil.html';
-          } else {
-            openAuthModal();
-          }
-        });
-      }
+      // ===== SESSION INIT =====
+      await initSession();
+
+      document.getElementById('btnProfil').addEventListener('click', async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) window.location.href = 'profil.html';
+        else openAuthModal();
+      });
+
+      // Écoute les changements d'état auth (confirmation email, login, logout)
+      sb.auth.onAuthStateChange((_event, session) => {
+        updateNavAvatar(session);
+      });
     });
+
+    async function initSession() {
+      // Récupère la session (y compris après callback de confirmation email)
+      const { data: { session } } = await sb.auth.getSession();
+      updateNavAvatar(session);
+    }
+
+    function updateNavAvatar(session) {
+      const btnProfil = document.getElementById('btnProfil');
+      const navAvatar = document.getElementById('navAvatar');
+      const navAvatarInitials = document.getElementById('navAvatarInitials');
+
+      if (session && session.user) {
+        const user = session.user;
+        const name = user.user_metadata?.full_name || user.email || '';
+        const initials = name.trim().split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+
+        navAvatarInitials.textContent = initials || '?';
+        btnProfil.style.display = 'none';
+        navAvatar.classList.add('visible');
+      } else {
+        btnProfil.style.display = '';
+        navAvatar.classList.remove('visible');
+      }
+    }
 
     // ===== AUTH MODAL =====
     function openAuthModal() {

@@ -457,6 +457,14 @@
       margin-bottom: 32px;
     }
 
+    .profile-avatar-wrap {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
     .profile-avatar-big {
       width: 80px;
       height: 80px;
@@ -469,9 +477,60 @@
       font-size: 1.8rem;
       font-weight: 700;
       color: #fff;
-      flex-shrink: 0;
       border: 3px solid rgba(124,185,40,0.3);
+      overflow: hidden;
+      transition: filter 0.2s;
+      width: 100%;
+      height: 100%;
     }
+
+    .profile-avatar-big img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .profile-avatar-wrap:hover .profile-avatar-big {
+      filter: brightness(0.7);
+    }
+
+    .avatar-edit-btn {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 26px;
+      height: 26px;
+      background: var(--green);
+      border-radius: 50%;
+      border: 2px solid var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+
+    .profile-avatar-wrap:hover .avatar-edit-btn {
+      background: var(--green-dark);
+      transform: scale(1.1);
+    }
+
+    .avatar-edit-btn svg { width: 12px; height: 12px; color: #fff; }
+
+    .avatar-uploading {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-uploading.active { display: flex; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .profile-avatar-info h2 {
       font-family: 'Oswald', sans-serif;
@@ -802,8 +861,18 @@
 
       <!-- ===== PAGE : MON PROFIL ===== -->
       <div class="page" id="page-profile">
+        <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;" onchange="handleAvatarUpload(event)">
+
         <div class="profile-header">
-          <div class="profile-avatar-big" id="profileAvatarBig">?</div>
+          <div class="profile-avatar-wrap" onclick="document.getElementById('avatarInput').click()">
+            <div class="profile-avatar-big" id="profileAvatarBig">?</div>
+            <div class="avatar-uploading" id="avatarUploading">
+              <div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+            </div>
+            <div class="avatar-edit-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+          </div>
           <div class="profile-avatar-info">
             <h2 id="profileName">—</h2>
             <p id="profileEmail">—</p>
@@ -993,6 +1062,7 @@
           updateRoleBadge(data.role);
         }
         if (data.preferred_discipline) document.getElementById('fieldDiscipline').value = data.preferred_discipline;
+        if (data.avatar_url) setAvatarImage(data.avatar_url + '?t=' + Date.now());
       }
     }
 
@@ -1088,6 +1158,54 @@
       } else {
         msg.textContent = '✗ ' + error.message; msg.style.color = '#ff6b6b'; msg.style.display = 'block';
       }
+    }
+
+    // ===== AVATAR UPLOAD =====
+    async function handleAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const uploading = document.getElementById('avatarUploading');
+      uploading.classList.add('active');
+
+      const ext = file.name.split('.').pop();
+      const path = `${currentUser.id}/avatar.${ext}`;
+
+      // Upload dans Supabase Storage
+      const { error: uploadError } = await sb.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, contentType: file.type });
+
+      if (uploadError) {
+        uploading.classList.remove('active');
+        alert('Erreur lors de l\'upload : ' + uploadError.message);
+        return;
+      }
+
+      // Récupère l'URL publique
+      const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(path);
+      const avatarUrl = publicUrl + '?t=' + Date.now(); // cache busting
+
+      // Sauvegarde en DB
+      await sb.from('profiles').upsert({
+        id: currentUser.id,
+        avatar_url: publicUrl,
+        updated_at: new Date().toISOString()
+      });
+
+      // Met à jour l'UI
+      setAvatarImage(avatarUrl);
+      uploading.classList.remove('active');
+      event.target.value = '';
+    }
+
+    function setAvatarImage(url) {
+      const el = document.getElementById('profileAvatarBig');
+      el.innerHTML = `<img src="${url}" alt="Avatar">`;
+      // Topbar avatar aussi
+      const topbarAvatar = document.getElementById('topbarAvatar');
+      topbarAvatar.style.background = 'transparent';
+      topbarAvatar.innerHTML = `<img src="${url}" alt="Avatar" style="width:38px;height:38px;border-radius:50%;object-fit:cover;">`;
     }
 
     // ===== ROLE BADGE =====

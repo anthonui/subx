@@ -1182,15 +1182,44 @@
     async function syncGoogleAvatar(user) {
       const googleAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
       if (!googleAvatar) return;
-      const { data } = await sb.from('profiles').select('avatar_url').eq('id', user.id).single();
+
+      const { data } = await sb.from('profiles').select('avatar_url, city').eq('id', user.id).single();
       if (!data?.avatar_url) {
-        await sb.from('profiles').upsert({
+        const upsertData = {
           id: user.id,
           avatar_url: googleAvatar,
           email: user.email,
           full_name: user.user_metadata?.full_name || user.user_metadata?.name || ''
-        });
+        };
+
+        // Détecte la ville via géolocalisation si pas encore renseignée
+        if (!data?.city) {
+          try {
+            const city = await detectCity();
+            if (city) upsertData.city = city;
+          } catch (_) {}
+        }
+
+        await sb.from('profiles').upsert(upsertData);
       }
+    }
+
+    function detectCity() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) return reject('no geolocation');
+        navigator.geolocation.getCurrentPosition(async pos => {
+          try {
+            const { latitude, longitude } = pos.coords;
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+              { headers: { 'Accept-Language': 'fr' } }
+            );
+            const json = await res.json();
+            const city = json.address?.city || json.address?.town || json.address?.village || json.address?.county || '';
+            resolve(city);
+          } catch (e) { reject(e); }
+        }, reject, { timeout: 5000 });
+      });
     }
 
     // ===== AVATAR UPLOAD =====

@@ -548,7 +548,8 @@
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 20px 20px;
+      margin-bottom: 24px;
     }
 
     .form-field {
@@ -585,6 +586,16 @@
     }
 
     .form-field input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* Override autofill white background (Chrome/Safari) */
+    .form-field input:-webkit-autofill,
+    .form-field input:-webkit-autofill:hover,
+    .form-field input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 1000px #2a2a2a inset;
+      -webkit-text-fill-color: var(--white);
+      caret-color: var(--white);
+      border-color: rgba(255,255,255,0.1);
+    }
 
     .form-field select option { background: var(--dark); }
 
@@ -922,7 +933,7 @@
             </div>
           </div>
           <button class="btn-save" id="btnSave" onclick="saveProfile()">Sauvegarder</button>
-          <p class="save-msg" id="saveMsg">✓ Profil mis à jour avec succès</p>
+          <p class="save-msg" id="saveMsg"></p>
         </div>
 
         <div class="card danger-zone">

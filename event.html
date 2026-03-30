@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUBX — Détail événement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== VARIABLES ========== */
+    :root {
+      --green: #7CB928;
+      --green-dark: #5A8A1E;
+      --green-light: #9BD43E;
+      --black: #1A1A1A;
+      --dark: #2A2A2A;
+      --gray: #F5F5F5;
+      --white: #FFFFFF;
+    }
+
+    /* ========== RESET ========== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ========== NAVBAR ========== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(26, 26, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .navbar-logo {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--white);
+    }
+
+    .navbar-logo-img { height: 32px; width: auto; display: block; }
+
+    .navbar-links { display: flex; align-items: center; gap: 32px; }
+    .navbar-links a { font-size: 0.875rem; font-weight: 500; color: #ccc; transition: color 0.2s; }
+    .navbar-links a:hover { color: var(--green); }
+
+    .navbar-right { display: flex; align-items: center; gap: 16px; }
+
+    .btn-outline {
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1.5px solid var(--green);
+      color: var(--green);
+      padding: 8px 18px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      cursor: pointer;
+      background: transparent;
+    }
+    .btn-outline:hover { background: var(--green); color: var(--white); }
+
+    .navbar-icon { color: #999; cursor: pointer; transition: color 0.2s; background: none; border: none; }
+    .navbar-icon:hover { color: var(--green); }
+
+    .hamburger { display: none; background: none; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; }
+
+    .mobile-menu { display: none; background: var(--black); border-top: 1px solid rgba(255,255,255,0.05); padding: 20px; }
+    .mobile-menu.active { display: block; }
+    .mobile-menu a { display: block; padding: 10px 0; color: #ccc; font-size: 0.95rem; font-weight: 500; }
+    .mobile-menu a:hover { color: var(--green); }
+
+    /* ========== BREADCRUMB ========== */
+    .breadcrumb {
+      padding: 20px 0;
+      font-size: 0.8rem;
+      color: #999;
+    }
+
+    .breadcrumb a { color: #777; transition: color 0.2s; }
+    .breadcrumb a:hover { color: var(--green); }
+    .breadcrumb span { color: var(--black); font-weight: 500; }
+
+    /* ========== HERO IMAGE ========== */
+    .event-hero {
+      width: 100%;
+      min-height: 340px;
+      background: linear-gradient(135deg, var(--black), var(--dark));
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .event-hero-overlay {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      padding: 48px 0 44px;
+    }
+
+    .event-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.15) 100%);
+      z-index: 1;
+    }
+
+    .breadcrumb--hero {
+      padding: 0 0 24px;
+    }
+
+    .breadcrumb--hero a { color: rgba(255,255,255,0.5); }
+    .breadcrumb--hero a:hover { color: var(--green); }
+    .breadcrumb--hero span { color: var(--white); }
+
+    .event-hero-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .event-hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .event-hero-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2.4rem, 5vw, 3.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      line-height: 1.05;
+    }
+
+    .event-hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-top: 4px;
+    }
+
+    .event-hero-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .event-hero-meta-item svg {
+      width: 16px;
+      height: 16px;
+      color: var(--green);
+      flex-shrink: 0;
+    }
+
+    .event-hero-meta-item strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    /* ========== LAYOUT ========== */
+    .event-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 48px;
+      padding: 48px 0 80px;
+      align-items: start;
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    .event-header-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+      color: var(--white);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .tag--green { background: var(--green); }
+    .tag--dark { background: var(--dark); color: rgba(255,255,255,0.7); }
+
+    .event-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: var(--black);
+      line-height: 1.1;
+    }
+
+    .event-quick-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-top: 20px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .event-quick-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: #555;
+    }
+
+    .event-quick-item svg {
+      width: 18px;
+      height: 18px;
+      color: var(--green);
+      flex-shrink: 0;
+    }
+
+    .event-quick-item strong {
+      color: var(--black);
+      font-weight: 600;
+    }
+
+    /* ========== SECTIONS ========== */
+    .event-section {
+      padding-top: 36px;
+    }
+
+    .event-section-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--black);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .event-section-title::before {
+      content: '';
+      width: 4px;
+      height: 22px;
+      background: var(--green);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .event-description {
+      font-size: 0.92rem;
+      line-height: 1.75;
+      color: #555;
+    }
+
+    .event-description p + p {
+      margin-top: 14px;
+    }
+
+    /* ========== PROGRAMME ========== */
+    .programme-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .programme-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .programme-item:last-child { border-bottom: none; }
+
+    .programme-time {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--green);
+      min-width: 60px;
+      flex-shrink: 0;
+    }
+
+    .programme-label {
+      font-size: 0.88rem;
+      color: #444;
+      font-weight: 500;
+    }
+
+    .programme-label small {
+      display: block;
+      font-size: 0.78rem;
+      color: #999;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    /* ========== INFO GRID ========== */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .info-item {
+      background: var(--gray);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .info-item-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #999;
+      margin-bottom: 6px;
+    }
+
+    .info-item-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    /* ========== TABS ========== */
+    .event-tabs {
+      display: flex;
+      border-bottom: 2px solid #eee;
+      margin-top: 28px;
+      margin-bottom: 0;
+      gap: 0;
+    }
+
+    .event-tab {
+      padding: 14px 28px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #999;
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .event-tab::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: transparent;
+      transition: background 0.2s;
+    }
+
+    .event-tab:hover {
+      color: #555;
+    }
+
+    .event-tab.active {
+      color: var(--black);
+    }
+
+    .event-tab.active::after {
+      background: var(--green);
+    }
+
+    .tab-panel {
+      display: none;
+      padding-top: 32px;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* ========== SIDEBAR ========== */
+    .event-sidebar {
+      position: sticky;
+      top: 88px;
+    }
+
+    .sidebar-card {
+      background: var(--white);
+      border: 1px solid #e8e8e8;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+    }
+
+    .sidebar-price {
+      margin-bottom: 24px;
+    }
+
+    .sidebar-price small {
+      font-size: 0.75rem;
+      color: #999;
+      display: block;
+    }
+
+    .sidebar-price strong {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .sidebar-details {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 24px;
+    }
+
+    .sidebar-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .sidebar-detail svg {
+      width: 18px;
+      height: 18px;
+      color: var(--green);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .sidebar-detail-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-detail-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #999;
+    }
+
+    .sidebar-detail-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--black);
+      margin-top: 2px;
+    }
+
+    .btn-register {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-align: center;
+    }
+
+    .btn-register:hover {
+      background: var(--green-dark);
+      transform: scale(1.02);
+    }
+
+    .sidebar-organizer {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      font-size: 0.78rem;
+      color: #999;
+    }
+
+    .sidebar-organizer strong {
+      color: var(--black);
+      font-weight: 600;
+    }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      background: var(--black);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 64px 0 32px;
+      color: var(--white);
+    }
+    .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr; gap: 32px; }
+    .footer-logo-img { height: 36px; width: auto; display: block; }
+    .footer-tagline { margin-top: 4px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: #666; font-weight: 500; }
+    .footer-socials { display: flex; gap: 12px; margin-top: 24px; }
+    .footer-socials a { color: #666; transition: color 0.2s; }
+    .footer-socials a:hover { color: var(--green); }
+    .footer-socials svg { width: 18px; height: 18px; }
+    .footer-col h4 { font-family: 'Oswald', sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--white); margin-bottom: 16px; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { font-size: 0.82rem; color: #777; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--green); }
+    .footer-bottom { margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 0.75rem; color: #555; }
+
+    /* ========== LOADING ========== */
+    .loading {
+      text-align: center;
+      padding: 80px 0;
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 960px) {
+      .event-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .event-sidebar {
+        position: static;
+        order: -1;
+      }
+
+      .event-hero { min-height: 300px; }
+    }
+
+    @media (max-width: 768px) {
+      .navbar-links, .navbar-right { display: none; }
+      .hamburger { display: block; }
+
+      .event-hero { min-height: 280px; }
+      .event-hero-meta { gap: 12px; }
+
+      .info-grid { grid-template-columns: 1fr; }
+
+      .event-quick-info { gap: 14px; }
+
+      .event-tab { padding: 12px 16px; font-size: 0.8rem; }
+
+      .footer-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-logo"><img src="logo_subx.svg" alt="SUBX — Find Your Challenge" class="navbar-logo-img"></a>
+
+      <div class="navbar-links">
+        <a href="index.html#events">Événements</a>
+        <a href="index.html#disciplines">Disciplines</a>
+        <a href="index.html#community">Communauté</a>
+        <a href="index.html#blog">Blog</a>
+      </div>
+
+      <div class="navbar-right">
+        <a href="index.html#organizer" class="btn-outline">Espace Organisateur</a>
+        <button class="navbar-icon" aria-label="Panier">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </button>
+        <button class="navbar-icon" aria-label="Profil">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+      </div>
+
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html#events">Événements</a>
+      <a href="index.html#disciplines">Disciplines</a>
+      <a href="index.html#community">Communauté</a>
+      <a href="index.html#blog">Blog</a>
+      <a href="index.html#organizer" class="btn-outline" style="display:inline-block;margin-top:10px">Espace Organisateur</a>
+    </div>
+  </nav>
+
+  <!-- ========== HERO IMAGE ========== -->
+  <div class="event-hero" id="eventHero">
+    <div class="event-hero-overlay">
+      <div class="container">
+        <div class="breadcrumb breadcrumb--hero">
+          <a href="index.html">Accueil</a> / <a href="index.html#events">Événements</a> / <span id="breadcrumbName">...</span>
+        </div>
+        <div class="event-hero-content">
+          <div class="event-hero-tags" id="heroTags"></div>
+          <h1 class="event-hero-title" id="heroTitle">...</h1>
+          <div class="event-hero-meta" id="heroMeta"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CONTENT ========== -->
+  <div class="container">
+
+    <div id="eventContent">
+      <p class="loading">Chargement de l'événement...</p>
+    </div>
+  </div>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="logo_subx.svg" alt="SUBX" class="footer-logo-img">
+          <p class="footer-tagline">Find Your Challenge</p>
+          <div class="footer-socials">
+            <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg></a>
+            <a href="#" aria-label="X / Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg></a>
+            <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          </div>
+        </div>
+        <div class="footer-col"><h4>Types</h4><ul><li><a href="#">Hyrox Style</a></li><li><a href="#">Obstacle Race</a></li><li><a href="#">Functional Fitness</a></li><li><a href="#">Urban Race</a></li></ul></div>
+        <div class="footer-col"><h4>Destinations</h4><ul><li><a href="#">Paris</a></li><li><a href="#">Lyon</a></li><li><a href="#">Marseille</a></li><li><a href="#">Bordeaux</a></li><li><a href="#">Lille</a></li></ul></div>
+        <div class="footer-col"><h4>À propos</h4><ul><li><a href="#">Notre histoire</a></li><li><a href="#">L'équipe</a></li><li><a href="#">Blog</a></li><li><a href="#">Contact</a></li></ul></div>
+        <div class="footer-col"><h4>Légal</h4><ul><li><a href="#">CGU</a></li><li><a href="#">CGV</a></li><li><a href="#">Confidentialité</a></li><li><a href="#">Cookies</a></li></ul></div>
+      </div>
+      <div class="footer-bottom">© 2026 SUBX — Tous droits réservés</div>
+    </div>
+  </footer>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://ipuryomreqlrhhutjnkq.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwdXJ5b21yZXFscmhodXRqbmtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjUxODEsImV4cCI6MjA5MDQ0MTE4MX0.yKO82AzFVYwI8TD2UhtqmrneGAHA32IA2gNDoZo7V8A'
+    );
+
+    function formatDate(iso) {
+      const d = new Date(iso + 'T12:00:00');
+      const str = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // Mobile menu
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    }
+
+    async function loadEvent() {
+      const id = new URLSearchParams(window.location.search).get('id');
+      const content = document.getElementById('eventContent');
+
+      if (!id) {
+        content.innerHTML = '<p class="loading">Aucun événement sélectionné.</p>';
+        return;
+      }
+
+      const { data: e, error } = await sb
+        .from('event')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error || !e) {
+        content.innerHTML = '<p class="loading">Événement introuvable.</p>';
+        return;
+      }
+
+      // Hero image
+      if (e.image_url) {
+        document.getElementById('eventHero').style.backgroundImage = `url('${e.image_url}')`;
+      }
+
+      // Page title & breadcrumb
+      document.title = `SUBX — ${e.name}`;
+      document.getElementById('breadcrumbName').textContent = e.name;
+
+      // Hero content
+      const greenTags = ['Solo', "Rx'd"];
+      const formats = e.formats || [];
+
+      document.getElementById('heroTitle').textContent = e.name;
+      document.getElementById('heroTags').innerHTML = formats.map(t =>
+        `<span class="tag ${greenTags.includes(t) ? 'tag--green' : 'tag--dark'}">${t}</span>`
+      ).join('');
+      document.getElementById('heroMeta').innerHTML = `
+        <div class="event-hero-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+          <strong>${formatDate(e.date)}</strong>
+        </div>
+        <div class="event-hero-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <strong>${e.city || 'Lieu à confirmer'}</strong>
+        </div>
+        ${e.race_type ? `<div class="event-hero-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+          <strong>${e.race_type}</strong>
+        </div>` : ''}
+        <div class="event-hero-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/></svg>
+          <strong>Dès €${e.price_from || '—'}</strong>
+        </div>
+      `;
+
+      const programme = e.programme || [];
+      const description = e.description || 'Informations à venir.';
+
+      content.innerHTML = `
+        <div class="event-layout">
+          <!-- ===== MAIN ===== -->
+          <div class="event-main">
+
+            <!-- TABS -->
+            <div class="event-tabs">
+              <button class="event-tab active" data-tab="infos">Informations</button>
+              <button class="event-tab" data-tab="programme">Programme</button>
+              <button class="event-tab" data-tab="details">Détails</button>
+            </div>
+
+            <!-- TAB: Informations -->
+            <div class="tab-panel active" id="tab-infos">
+              <div class="event-section">
+                <div class="event-description">${description.split('\n').filter(p => p.trim()).map(p => `<p>${p}</p>`).join('')}</div>
+              </div>
+            </div>
+
+            <!-- TAB: Programme -->
+            <div class="tab-panel" id="tab-programme">
+              ${programme.length ? `
+              <div class="programme-list">
+                ${programme.map(p => `
+                  <div class="programme-item">
+                    <span class="programme-time">${p.time}</span>
+                    <div class="programme-label">${p.label}${p.detail ? `<small>${p.detail}</small>` : ''}</div>
+                  </div>
+                `).join('')}
+              </div>` : '<p style="color:#999">Programme à venir.</p>'}
+            </div>
+
+            <!-- TAB: Détails -->
+            <div class="tab-panel" id="tab-details">
+              <div class="info-grid">
+                ${e.race_type ? `<div class="info-item"><p class="info-item-label">Type de course</p><p class="info-item-value">${e.race_type}</p></div>` : ''}
+                ${e.level ? `<div class="info-item"><p class="info-item-label">Niveaux</p><p class="info-item-value">${e.level}</p></div>` : ''}
+                ${formats.length ? `<div class="info-item"><p class="info-item-label">Formats</p><p class="info-item-value">${formats.join(', ')}</p></div>` : ''}
+                ${e.city ? `<div class="info-item"><p class="info-item-label">Lieu</p><p class="info-item-value">${e.city}</p></div>` : ''}
+                <div class="info-item"><p class="info-item-label">Date</p><p class="info-item-value">${formatDate(e.date)}</p></div>
+                <div class="info-item"><p class="info-item-label">Prix à partir de</p><p class="info-item-value">€${e.price_from || '—'}</p></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== SIDEBAR ===== -->
+          <aside class="event-sidebar">
+            <div class="sidebar-card">
+              <div class="sidebar-price">
+                <small>À partir de</small>
+                <strong>€${e.price_from || '—'}</strong>
+              </div>
+
+              <div class="sidebar-details">
+                <div class="sidebar-detail">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                  <div class="sidebar-detail-text">
+                    <span class="sidebar-detail-label">Date</span>
+                    <span class="sidebar-detail-value">${formatDate(e.date)}</span>
+                  </div>
+                </div>
+                <div class="sidebar-detail">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <div class="sidebar-detail-text">
+                    <span class="sidebar-detail-label">Lieu</span>
+                    <span class="sidebar-detail-value">${e.city || 'À confirmer'}</span>
+                  </div>
+                </div>
+                ${e.race_type ? `
+                <div class="sidebar-detail">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+                  <div class="sidebar-detail-text">
+                    <span class="sidebar-detail-label">Type</span>
+                    <span class="sidebar-detail-value">${e.race_type}</span>
+                  </div>
+                </div>` : ''}
+                ${formats.length ? `
+                <div class="sidebar-detail">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  <div class="sidebar-detail-text">
+                    <span class="sidebar-detail-label">Formats</span>
+                    <span class="sidebar-detail-value">${formats.join(' · ')}</span>
+                  </div>
+                </div>` : ''}
+              </div>
+
+              <button class="btn-register">S'inscrire</button>
+
+              ${e.organizer_name ? `
+              <div class="sidebar-organizer">
+                Organisé par <strong>${e.organizer_name}</strong>
+              </div>` : ''}
+            </div>
+          </aside>
+        </div>
+      `;
+    }
+
+    function initTabs() {
+      document.querySelectorAll('.event-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.event-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadEvent();
+      initTabs();
+    });
+  </script>
+
+</body>
+</html>

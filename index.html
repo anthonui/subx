@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUBX — Find Your Challenge</title>
+  <meta name="description" content="Découvre et réserve ta prochaine course hybride en France. Hyrox, OCR, Functional Fitness et plus encore.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== VARIABLES ========== */
+    :root {
+      --green: #7CB928;
+      --green-dark: #5A8A1E;
+      --green-light: #9BD43E;
+      --black: #1A1A1A;
+      --dark: #2A2A2A;
+      --gray: #F5F5F5;
+      --white: #FFFFFF;
+    }
+
+    /* ========== RESET ========== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    ul { list-style: none; }
+
+    img { max-width: 100%; display: block; }
+
+    /* ========== UTILITIES ========== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .section-subtitle {
+      color: var(--green);
+      font-style: italic;
+      font-size: 1.1rem;
+      margin-top: 8px;
+    }
+
+    /* ========== NAVBAR ========== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(26, 26, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .navbar-logo {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--white);
+    }
+
+    .navbar-logo-img {
+      height: 32px;
+      width: auto;
+      display: block;
+    }
+
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .navbar-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #ccc;
+      transition: color 0.2s;
+    }
+
+    .navbar-links a:hover { color: var(--green); }
+
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-outline {
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1.5px solid var(--green);
+      color: var(--green);
+      padding: 8px 18px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .btn-outline:hover {
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .navbar-icon {
+      color: #999;
+      cursor: pointer;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+    }
+
+    .navbar-icon:hover { color: var(--green); }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .mobile-menu {
+      display: none;
+      background: var(--black);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 20px;
+    }
+
+    .mobile-menu.active { display: block; }
+
+    .mobile-menu a {
+      display: block;
+      padding: 10px 0;
+      color: #ccc;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .mobile-menu a:hover { color: var(--green); }
+
+    /* ========== HERO ========== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: var(--black);
+      position: relative;
+      overflow: hidden;
+      padding: 80px 20px;
+    }
+
+    /* Background image */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('image_background/victor-freitas-KkYWWpurqbE-unsplash (1).webp') center/cover no-repeat;
+      opacity: 0.55;
+    }
+
+    /* Dark + green overlay on top of image */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(26,26,26,0.85) 0%, rgba(42,42,42,0.4) 45%, rgba(26,26,26,0.9) 100%),
+        radial-gradient(ellipse at center, rgba(124,185,40,0.1) 0%, transparent 70%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      max-width: 800px;
+    }
+
+    .hero h1 {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      color: var(--white);
+    }
+
+    @keyframes heartbeat {
+      0%, 100%  { transform: scale(1); }
+      5%        { transform: scale(1.028); }
+      10%       { transform: scale(1); }
+      15%       { transform: scale(1.016); }
+      20%       { transform: scale(1); }
+      55%       { transform: scale(1.024); }
+      60%       { transform: scale(1); }
+    }
+
+    .hero-accent {
+      display: block;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-style: italic;
+      color: var(--green);
+      margin-top: 16px;
+    }
+
+    .hero-accent-beat {
+      display: inline-block;
+      animation: heartbeat 4s ease-in-out infinite;
+      transform-origin: center center;
+    }
+
+    .hero-desc {
+      margin-top: 24px;
+      font-size: 1.05rem;
+      color: #bbb;
+      line-height: 1.7;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Search bar */
+    .search-bar {
+      margin-top: 40px;
+      display: flex;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-right: none;
+      color: var(--white);
+      padding: 14px 20px;
+      font-size: 0.85rem;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      border-radius: 8px 0 0 8px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input::placeholder { color: #777; }
+    .search-bar input:focus { border-color: var(--green); }
+
+    .search-bar button {
+      background: var(--green);
+      border: none;
+      color: var(--white);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-bar button:hover { background: var(--green-dark); }
+
+    .search-bar button svg { width: 20px; height: 20px; }
+
+    /* Stats */
+    .hero-stats {
+      margin-top: 60px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 24px;
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    .hero-stats .stat-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--white);
+      display: block;
+    }
+
+    .hero-stats .stat-dot {
+      color: rgba(124,185,40,0.4);
+      font-size: 1.2rem;
+      align-self: center;
+    }
+
+
+    /* ========== EVENTS ========== */
+    .events {
+      background: var(--gray);
+      padding: 80px 0 100px;
+    }
+
+    .events .section-title { color: var(--black); }
+
+    .events-grid {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .event-card {
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      transition: box-shadow 0.35s ease, transform 0.35s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .event-card:hover {
+      box-shadow: 0 8px 40px rgba(0,0,0,0.14);
+      transform: translateY(-6px);
+    }
+
+    .event-card:hover .event-card-image img,
+    .event-card:hover .event-card-image {
+      transform: scale(1.05);
+    }
+
+    .event-card-image {
+      position: relative;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, var(--black), var(--dark));
+      overflow: hidden;
+      transition: transform 0.5s ease;
+    }
+
+    .event-card-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
+      z-index: 1;
+    }
+
+    .event-card-image h3 {
+      position: absolute;
+      bottom: 14px;
+      left: 16px;
+      right: 16px;
+      z-index: 2;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+      letter-spacing: 0.03em;
+      line-height: 1.2;
+    }
+
+    .event-card-body {
+      padding: 18px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .event-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: var(--white);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .tag--green { background: var(--green); }
+    .tag--dark { background: var(--dark); color: rgba(255,255,255,0.7); }
+
+    .event-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .event-date,
+    .event-location {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: #666;
+    }
+
+    .event-date svg,
+    .event-location svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+
+    .event-date {
+      font-weight: 600;
+      color: #444;
+    }
+
+    .event-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .event-price {
+      color: var(--black);
+    }
+
+    .event-price small {
+      font-size: 0.7rem;
+      color: #999;
+      display: block;
+      line-height: 1;
+    }
+
+    .event-price strong {
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .btn-details {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      text-align: center;
+    }
+
+    .btn-details:hover {
+      background: var(--green-dark);
+      transform: scale(1.04);
+    }
+
+    .events-more {
+      margin-top: 48px;
+      text-align: center;
+    }
+
+    .events-more a {
+      color: var(--green);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+    }
+
+    .events-more a:hover { color: var(--green-dark); }
+
+    /* ========== DISCIPLINES ========== */
+    .disciplines {
+      background: var(--black);
+      padding: 80px 0 100px;
+    }
+
+    .disciplines-grid {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .discipline-card {
+      background: var(--dark);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 28px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .discipline-card:hover {
+      border-color: var(--green);
+      transform: scale(1.03);
+    }
+
+    .discipline-card svg {
+      width: 32px;
+      height: 32px;
+      color: var(--green);
+      margin-bottom: 16px;
+    }
+
+    .discipline-card h3 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .discipline-card p {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #999;
+      line-height: 1.5;
+    }
+
+    .discipline-count {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    /* ========== CALENDAR ========== */
+    .calendar {
+      background: var(--gray);
+      padding: 80px 0 100px;
+    }
+
+    .calendar .section-title { color: var(--black); }
+
+    .calendar-grid {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .month-card {
+      background: var(--white);
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .month-card:hover { border-color: var(--green); }
+
+    .month-card h3 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .month-card p {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #999;
+    }
+
+    .month-card--current {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .month-card--current h3 { color: var(--white); }
+    .month-card--current p { color: rgba(255,255,255,0.8); }
+    .month-card--current:hover { background: var(--green-dark); border-color: var(--green-dark); }
+
+    /* ========== CITIES ========== */
+    .cities {
+      background: var(--black);
+      padding: 80px 0 100px;
+    }
+
+    .cities-grid {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .city-card {
+      background: linear-gradient(135deg, var(--dark), var(--black));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .city-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(124,185,40,0);
+      transition: background 0.3s;
+    }
+
+    .city-card:hover {
+      transform: scale(1.03);
+    }
+
+    .city-card:hover::before {
+      background: rgba(124,185,40,0.1);
+    }
+
+    .city-card h3 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+      position: relative;
+      z-index: 2;
+    }
+
+    .city-card p {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--green);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ========== WHY SUBX ========== */
+    .why {
+      background: var(--white);
+      padding: 80px 0 100px;
+    }
+
+    .why .section-title { color: var(--black); }
+
+    .why-grid {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+    }
+
+    .why-item {}
+
+    .why-icon {
+      width: 56px;
+      height: 56px;
+      background: rgba(124,185,40,0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .why-icon svg {
+      width: 28px;
+      height: 28px;
+      color: var(--green);
+    }
+
+    .why-item h3 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .why-item p {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* ========== CTA ORGANIZER ========== */
+    .cta-organizer {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      padding: 80px 20px;
+      text-align: center;
+    }
+
+    .cta-organizer h2 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .cta-organizer p {
+      margin-top: 16px;
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .btn-cta {
+      display: inline-block;
+      margin-top: 32px;
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 14px 32px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-cta:hover {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      background: var(--black);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 64px 0 32px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+      gap: 32px;
+    }
+
+    .footer-brand {}
+
+    .footer-logo-img {
+      height: 36px;
+      width: auto;
+      display: block;
+    }
+
+    .footer-tagline {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .footer-socials {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .footer-socials a {
+      color: #666;
+      transition: color 0.2s;
+    }
+
+    .footer-socials a:hover { color: var(--green); }
+
+    .footer-socials svg { width: 18px; height: 18px; }
+
+    .footer-col h4 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    .footer-col li { margin-bottom: 8px; }
+
+    .footer-col a {
+      font-size: 0.85rem;
+      color: #666;
+      transition: color 0.2s;
+    }
+
+    .footer-col a:hover { color: var(--green); }
+
+    .footer-bottom {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      text-align: center;
+      font-size: 0.75rem;
+      color: #555;
+    }
+
+    /* ========== SCROLL ANIMATIONS ========== */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 1024px) {
+      .events-grid { grid-template-columns: repeat(2, 1fr); }
+      .disciplines-grid { grid-template-columns: repeat(2, 1fr); }
+      .calendar-grid { grid-template-columns: repeat(3, 1fr); }
+      .cities-grid { grid-template-columns: repeat(3, 1fr); }
+      .why-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .navbar-links,
+      .navbar-right { display: none; }
+      .hamburger { display: block; }
+
+      .section-title { font-size: 1.6rem; }
+
+      .events-grid { grid-template-columns: 1fr; }
+      .disciplines-grid { grid-template-columns: 1fr; }
+      .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+      .cities-grid { grid-template-columns: repeat(2, 1fr); }
+      .why-grid { grid-template-columns: 1fr; text-align: center; }
+      .why-icon { margin: 0 auto 16px; }
+      .footer-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-brand { grid-column: 1 / -1; }
+
+      .hero-stats { gap: 16px; }
+      .hero-stats .stat-dot { display: none; }
+
+      .cta-organizer h2 { font-size: 1.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+      .cities-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="#" class="navbar-logo"><img src="logo_subx.svg" alt="SUBX — Find Your Challenge" class="navbar-logo-img"></a>
+
+      <div class="navbar-links">
+        <a href="#events">Événements</a>
+        <a href="#disciplines">Disciplines</a>
+        <a href="#community">Communauté</a>
+        <a href="#blog">Blog</a>
+      </div>
+
+      <div class="navbar-right">
+        <a href="#organizer" class="btn-outline">Espace Organisateur</a>
+        <button class="navbar-icon" aria-label="Panier">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </button>
+        <button class="navbar-icon" aria-label="Profil">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+      </div>
+
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#events" onclick="closeMobileMenu()">Événements</a>
+      <a href="#disciplines" onclick="closeMobileMenu()">Disciplines</a>
+      <a href="#community" onclick="closeMobileMenu()">Communauté</a>
+      <a href="#blog" onclick="closeMobileMenu()">Blog</a>
+      <a href="#organizer" class="btn-outline" style="display:inline-block;margin-top:10px" onclick="closeMobileMenu()">Espace Organisateur</a>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="fade-up">Rejoins ta course hybride</h1>
+      <span class="hero-accent fade-up"><span class="hero-accent-beat">et repousse tes limites</span></span>
+      <p class="hero-desc fade-up">Explore les courses hybrides françaises selon tes critères, et plonge dans l'univers de chaque événement.</p>
+
+      <div class="search-bar fade-up">
+        <input type="text" placeholder="RECHERCHE UN LIEU, UNE COURSE...">
+        <button aria-label="Rechercher">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      </div>
+
+      <div class="hero-stats fade-up">
+        <div><span class="stat-number" data-target="164">0</span> événements</div>
+        <span class="stat-dot">•</span>
+        <div><span class="stat-number" data-target="28">0</span> villes</div>
+        <span class="stat-dot">•</span>
+        <div><span class="stat-number" data-target="4250">0</span> athlètes inscrits</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== EVENTS ========== -->
+  <section class="events" id="events">
+    <div class="container">
+      <h2 class="section-title fade-up">Événements à venir</h2>
+      <p class="section-subtitle fade-up">Près de chez toi</p>
+
+      <div class="events-grid" id="eventsGrid"></div>
+
+      <div class="events-more fade-up">
+        <a href="#">Voir tous les événements &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== DISCIPLINES ========== -->
+  <section class="disciplines" id="disciplines">
+    <div class="container">
+      <h2 class="section-title fade-up">Quel format te correspond ?</h2>
+
+      <div class="disciplines-grid" id="disciplinesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========== CALENDAR ========== -->
+  <section class="calendar">
+    <div class="container">
+      <h2 class="section-title fade-up">Calendrier des courses hybrides</h2>
+
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========== CITIES ========== -->
+  <section class="cities">
+    <div class="container">
+      <h2 class="section-title fade-up">Où courir une course hybride ?</h2>
+
+      <div class="cities-grid" id="citiesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========== WHY SUBX ========== -->
+  <section class="why">
+    <div class="container">
+      <h2 class="section-title fade-up">Pourquoi SUBX ?</h2>
+
+      <div class="why-grid" id="whyGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========== CTA ORGANIZER ========== -->
+  <section class="cta-organizer" id="organizer">
+    <div class="fade-up">
+      <h2>Tu organises des événements ?</h2>
+      <p>Publie ton événement sur SUBX et touche des milliers d'athlètes</p>
+      <a href="#" class="btn-cta">Créer mon événement</a>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="logo_subx.svg" alt="SUBX" class="footer-logo-img">
+          <p class="footer-tagline">Find Your Challenge</p>
+          <div class="footer-socials">
+            <a href="#" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>
+            </a>
+            <a href="#" aria-label="X / Twitter">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="#" aria-label="YouTube">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+            </a>
+            <a href="#" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Types</h4>
+          <ul>
+            <li><a href="#">Hyrox Style</a></li>
+            <li><a href="#">Obstacle Race</a></li>
+            <li><a href="#">Functional Fitness</a></li>
+            <li><a href="#">Urban Race</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Destinations</h4>
+          <ul>
+            <li><a href="#">Paris</a></li>
+            <li><a href="#">Lyon</a></li>
+            <li><a href="#">Marseille</a></li>
+            <li><a href="#">Bordeaux</a></li>
+            <li><a href="#">Lille</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>À propos</h4>
+          <ul>
+            <li><a href="#">Notre histoire</a></li>
+            <li><a href="#">L'équipe</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Légal</h4>
+          <ul>
+            <li><a href="#">CGU</a></li>
+            <li><a href="#">CGV</a></li>
+            <li><a href="#">Confidentialité</a></li>
+            <li><a href="#">Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        © 2026 SUBX — Tous droits réservés
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ===== SUPABASE =====
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://ipuryomreqlrhhutjnkq.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwdXJ5b21yZXFscmhodXRqbmtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjUxODEsImV4cCI6MjA5MDQ0MTE4MX0.yKO82AzFVYwI8TD2UhtqmrneGAHA32IA2gNDoZo7V8A'
+    );
+
+    function formatDate(iso) {
+      const d = new Date(iso + 'T12:00:00');
+      const str = d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    const disciplinesData = [
+      { name: "Hyrox Style", desc: "8 stations + courses de 1km entre chaque", count: 24, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>' },
+      { name: "Obstacle Race", desc: "Parcours d'obstacles type Spartan", count: 18, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>' },
+      { name: "Functional Fitness", desc: "WOD compétitifs, CrossFit-style", count: 15, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>' },
+      { name: "Urban Race", desc: "Course urbaine avec obstacles en ville", count: 12, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>' },
+      { name: "Team Challenge", desc: "Épreuves par équipes de 2 à 4", count: 20, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' },
+      { name: "Endurance Hybride", desc: "Longue distance + stations fonctionnelles", count: 8, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' },
+    ];
+
+    const calendarData = [
+      { name: "Janvier", count: 8 }, { name: "Février", count: 12 },
+      { name: "Mars", count: 15, current: true }, { name: "Avril", count: 10 },
+      { name: "Mai", count: 18 }, { name: "Juin", count: 22 },
+      { name: "Juillet", count: 14 }, { name: "Août", count: 9 },
+      { name: "Septembre", count: 20 }, { name: "Octobre", count: 16 },
+      { name: "Novembre", count: 13 }, { name: "Décembre", count: 7 },
+    ];
+
+    const citiesData = [
+      { name: "Paris", count: 32 }, { name: "Lyon", count: 18 },
+      { name: "Marseille", count: 15 }, { name: "Bordeaux", count: 12 },
+      { name: "Lille", count: 10 }, { name: "Toulouse", count: 14 },
+      { name: "Nice", count: 8 }, { name: "Nantes", count: 11 },
+    ];
+
+    const whyData = [
+      { title: "Réservation instantanée", desc: "Inscris-toi en 2 clics, plus de formulaires papier", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' },
+      { title: "Tous les formats", desc: "Hyrox, OCR, Functional Fitness... tout au même endroit", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>' },
+      { title: "Communauté", desc: "Retrouve tes partenaires d'entraînement et partage tes résultats", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' },
+      { title: "Espace Organisateur", desc: "Publie et gère ton événement facilement", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>' },
+    ];
+
+    // ===== RENDER FUNCTIONS =====
+    async function renderEvents() {
+      const grid = document.getElementById('eventsGrid');
+      const greenTags = ['Solo', "Rx'd"];
+
+      const { data, error } = await sb
+        .from('event')
+        .select('*')
+        .eq('published', true)
+        .order('date', { ascending: true });
+
+      if (error || !data.length) {
+        grid.innerHTML = '<p style="color:var(--gray);text-align:center;grid-column:1/-1">Aucun événement disponible pour le moment.</p>';
+        return;
+      }
+
+      grid.innerHTML = data.map(e => `
+        <div class="event-card fade-up">
+          <div class="event-card-image" ${e.image_url ? `style="background-image:url('${e.image_url}');background-size:cover;background-position:center"` : ''}>
+            <h3>${e.name}</h3>
+          </div>
+          <div class="event-card-body">
+            <div class="event-tags">
+              ${(e.formats || []).map(t => `<span class="tag ${greenTags.includes(t) ? 'tag--green' : 'tag--dark'}">${t}</span>`).join('')}
+            </div>
+            <div class="event-meta">
+              <p class="event-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+                ${formatDate(e.date)}
+              </p>
+              <div class="event-location">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                ${e.city}
+              </div>
+            </div>
+            <div class="event-footer">
+              <p class="event-price"><small>Dès</small><strong>€${e.price_from}</strong></p>
+              <button class="btn-details" onclick="window.location.href='event.html?id=${e.id}'">Détails</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderDisciplines() {
+      const grid = document.getElementById('disciplinesGrid');
+      grid.innerHTML = disciplinesData.map(d => `
+        <div class="discipline-card fade-up">
+          ${d.icon}
+          <h3>${d.name}</h3>
+          <p>${d.desc}</p>
+          <p class="discipline-count">${d.count} événements</p>
+        </div>
+      `).join('');
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = calendarData.map(m => `
+        <div class="month-card ${m.current ? 'month-card--current' : ''} fade-up">
+          <h3>${m.name}</h3>
+          <p>${m.count} événements</p>
+        </div>
+      `).join('');
+    }
+
+    function renderCities() {
+      const grid = document.getElementById('citiesGrid');
+      grid.innerHTML = citiesData.map(c => `
+        <div class="city-card fade-up">
+          <h3>${c.name}</h3>
+          <p>${c.count} événements</p>
+        </div>
+      `).join('');
+    }
+
+    function renderWhy() {
+      const grid = document.getElementById('whyGrid');
+      grid.innerHTML = whyData.map(w => `
+        <div class="why-item fade-up">
+          <div class="why-icon">${w.icon}</div>
+          <h3>${w.title}</h3>
+          <p>${w.desc}</p>
+        </div>
+      `).join('');
+    }
+
+    // ===== MOBILE MENU =====
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    }
+
+    function closeMobileMenu() {
+      document.getElementById('mobileMenu').classList.remove('active');
+    }
+
+    // ===== COUNTER ANIMATION =====
+    function animateCounters() {
+      document.querySelectorAll('.stat-number').forEach(el => {
+        const target = parseInt(el.dataset.target);
+        const duration = 2000;
+        const start = performance.now();
+
+        function update(now) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.floor(eased * target).toLocaleString('fr-FR');
+          if (progress < 1) requestAnimationFrame(update);
+        }
+
+        requestAnimationFrame(update);
+      });
+    }
+
+    // ===== SCROLL ANIMATIONS =====
+    function initScrollAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '-40px' });
+
+      document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    }
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', async () => {
+      await renderEvents();
+      renderDisciplines();
+      renderCalendar();
+      renderCities();
+      renderWhy();
+      animateCounters();
+
+      // Wait a frame so dynamically rendered elements get observed
+      requestAnimationFrame(() => {
+        initScrollAnimations();
+      });
+    });
+  </script>
+
+</body>
+</html>

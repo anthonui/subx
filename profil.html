@@ -1284,10 +1284,28 @@
     }
 
     // ===== DELETE ACCOUNT =====
-    function confirmDeleteAccount() {
-      if (confirm('Es-tu sûr de vouloir supprimer ton compte ? Cette action est irréversible.')) {
-        alert('Contacte le support pour supprimer ton compte.');
+    async function confirmDeleteAccount() {
+      const first = confirm('Es-tu sûr de vouloir supprimer ton compte SUBX ?\n\nToutes tes données seront définitivement effacées. Cette action est irréversible.');
+      if (!first) return;
+
+      const second = confirm('Dernière confirmation — supprimer définitivement ton compte ?');
+      if (!second) return;
+
+      const btn = document.querySelector('.btn-danger');
+      btn.textContent = 'Suppression...';
+      btn.disabled = true;
+
+      const { error } = await sb.rpc('delete_current_user');
+
+      if (error) {
+        btn.textContent = 'Supprimer mon compte';
+        btn.disabled = false;
+        alert('Erreur : ' + error.message);
+        return;
       }
+
+      await sb.auth.signOut();
+      window.location.href = 'index.html';
     }
   </script>
 </body>

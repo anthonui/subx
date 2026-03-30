@@ -1728,12 +1728,11 @@
     });
 
     async function initSession() {
-      // Récupère la session (y compris après callback de confirmation email)
       const { data: { session } } = await sb.auth.getSession();
-      updateNavAvatar(session);
+      if (session) await updateNavAvatar(session);
     }
 
-    function updateNavAvatar(session) {
+    async function updateNavAvatar(session) {
       const btnProfil = document.getElementById('btnProfil');
       const navAvatar = document.getElementById('navAvatar');
       const navAvatarInitials = document.getElementById('navAvatarInitials');
@@ -1743,7 +1742,15 @@
         const name = user.user_metadata?.full_name || user.email || '';
         const initials = name.trim().split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
 
-        navAvatarInitials.textContent = initials || '?';
+        // Récupère l'avatar depuis profiles
+        const { data: profile } = await sb.from('profiles').select('avatar_url').eq('id', user.id).single();
+
+        if (profile?.avatar_url) {
+          navAvatarInitials.innerHTML = `<img src="${profile.avatar_url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        } else {
+          navAvatarInitials.textContent = initials || '?';
+        }
+
         btnProfil.style.display = 'none';
         navAvatar.classList.add('visible');
       } else {

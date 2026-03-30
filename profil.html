@@ -222,6 +222,25 @@
       padding-top: 64px;
       flex: 1;
       min-height: 100vh;
+      background-image: url('dashboard_bg.webp');
+      background-size: cover;
+      background-position: center top;
+      background-attachment: fixed;
+      position: relative;
+    }
+
+    .main::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(26,26,26,0.92);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
     }
 
     .page { display: none; padding: 36px 32px; }

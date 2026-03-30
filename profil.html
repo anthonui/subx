@@ -281,20 +281,12 @@
       flex-direction: column;
       gap: 8px;
       position: relative;
-      overflow: hidden;
+      transition: box-shadow 0.3s ease;
     }
 
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--green);
-      opacity: 0;
-      transition: opacity 0.3s;
+    .stat-card:hover {
+      box-shadow: 0 0 0 1px rgba(124,185,40,0.2), 0 0 20px rgba(124,185,40,0.08);
     }
-
-    .stat-card:hover::before { opacity: 1; }
 
     .stat-icon {
       width: 36px;

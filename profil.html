@@ -1136,7 +1136,7 @@
         msg.textContent = '✓ Profil mis à jour avec succès';
         msg.style.color = 'var(--green)';
         msg.style.display = 'block';
-        updateRoleBadge(role);
+        updateRoleBadge(document.getElementById('fieldRole').value);
         if (fullName) {
           document.getElementById('profileName').textContent = fullName;
           document.getElementById('welcomeName').textContent = firstName || fullName;

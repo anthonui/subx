@@ -1722,14 +1722,33 @@
       });
 
       // Écoute les changements d'état auth (confirmation email, login, logout)
-      sb.auth.onAuthStateChange((_event, session) => {
-        updateNavAvatar(session);
+      sb.auth.onAuthStateChange(async (_event, session) => {
+        if (session) await syncGoogleAvatar(session.user);
+        await updateNavAvatar(session);
       });
     });
 
     async function initSession() {
       const { data: { session } } = await sb.auth.getSession();
-      if (session) await updateNavAvatar(session);
+      if (session) {
+        await syncGoogleAvatar(session.user);
+        await updateNavAvatar(session);
+      }
+    }
+
+    async function syncGoogleAvatar(user) {
+      const googleAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+      if (!googleAvatar) return;
+      // Sauvegarde en DB seulement si pas déjà une photo custom
+      const { data } = await sb.from('profiles').select('avatar_url').eq('id', user.id).single();
+      if (!data?.avatar_url) {
+        await sb.from('profiles').upsert({
+          id: user.id,
+          avatar_url: googleAvatar,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || user.user_metadata?.name || ''
+        });
+      }
     }
 
     async function updateNavAvatar(session) {

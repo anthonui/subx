@@ -1141,9 +1141,13 @@
           document.getElementById('profileName').textContent = fullName;
           document.getElementById('welcomeName').textContent = firstName || fullName;
           document.getElementById('topbarName').textContent = fullName;
-          const initials = fullName.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
-          document.getElementById('topbarAvatar').textContent = initials;
-          document.getElementById('profileAvatarBig').textContent = initials;
+          // Ne mettre les initiales que si pas de photo de profil
+          const hasAvatar = document.getElementById('profileAvatarBig').querySelector('img');
+          if (!hasAvatar) {
+            const initials = fullName.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+            document.getElementById('topbarAvatar').textContent = initials;
+            document.getElementById('profileAvatarBig').textContent = initials;
+          }
         }
         setTimeout(() => msg.style.display = 'none', 3000);
       } else {

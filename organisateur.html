@@ -260,6 +260,70 @@
     .auth-confirm-screen h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
     .auth-confirm-screen p { font-size: 0.8rem; color: rgba(255,255,255,0.45); line-height: 1.7; }
 
+    /* ========== ONBOARDING ========== */
+    #onboardingOverlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: var(--black);
+      z-index: 9980;
+      overflow-y: auto;
+      padding: 40px 20px 60px;
+    }
+    #onboardingOverlay.active { display: block; }
+    .onboarding-wrap {
+      max-width: 620px;
+      margin: 0 auto;
+    }
+    .onboarding-header { text-align: center; margin-bottom: 36px; }
+    .onboarding-header img { height: 28px; margin: 0 auto 20px; }
+    .onboarding-header h1 { font-family: 'Oswald', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 8px; }
+    .onboarding-header p { font-size: 0.82rem; color: rgba(255,255,255,0.4); line-height: 1.7; }
+    .onboarding-header .welcome-name { color: var(--green); }
+
+    .onboarding-steps { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
+    .ob-step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .ob-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); background: var(--dark); color: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; transition: all 0.3s; }
+    .ob-circle.active { border-color: var(--green); color: var(--green); background: rgba(124,185,40,0.1); }
+    .ob-circle.done { background: var(--green); border-color: var(--green); color: #fff; }
+    .ob-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.25); white-space: nowrap; }
+    .ob-label.active { color: var(--green); }
+    .ob-label.done { color: rgba(255,255,255,0.4); }
+    .ob-connector { width: 60px; height: 2px; background: rgba(255,255,255,0.08); margin-bottom: 20px; flex-shrink: 0; transition: background 0.3s; }
+    .ob-connector.done { background: var(--green); }
+
+    .ob-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 16px; }
+    .ob-card-title { font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .ob-card-sub { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-bottom: 22px; }
+
+    .org-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .org-type-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px 12px;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: rgba(255,255,255,0.5);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .org-type-btn svg { width: 28px; height: 28px; color: rgba(255,255,255,0.3); transition: color 0.2s; }
+    .org-type-btn:hover { border-color: rgba(124,185,40,0.4); color: rgba(255,255,255,0.8); }
+    .org-type-btn.selected { border-color: var(--green); background: rgba(124,185,40,0.1); color: var(--green); }
+    .org-type-btn.selected svg { color: var(--green); }
+    .org-type-sub { font-size: 0.65rem; color: rgba(255,255,255,0.25); margin-top: 2px; font-weight: 400; }
+
+    .ob-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    .ob-error { font-size: 0.78rem; color: #E57373; margin-top: 8px; min-height: 20px; }
+
+    .ob-success { text-align: center; padding: 40px 20px; }
+    .ob-success svg { margin: 0 auto 20px; color: var(--green); }
+    .ob-success h2 { font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+    .ob-success p { font-size: 0.82rem; color: rgba(255,255,255,0.45); line-height: 1.7; margin-bottom: 24px; }
+
     @media (max-width: 900px) {
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .formats-grid { grid-template-columns: 1fr 1fr; }
@@ -323,6 +387,140 @@
   <p style="font-size:0.85rem;color:rgba(255,255,255,0.5);max-width:360px;line-height:1.7;">Confirmez votre adresse pour accéder à l'espace organisateur.<br><strong id="unconfirmedEmail" style="color:#7CB928;"></strong></p>
   <button onclick="resendConfirmation()" style="background:var(--green);color:#fff;border:none;padding:12px 28px;border-radius:50px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;">Renvoyer l'email</button>
   <a href="index.html" style="font-size:0.8rem;color:rgba(255,255,255,0.35);">← Retour à l'accueil</a>
+</div>
+
+<!-- Onboarding Organisateur -->
+<div id="onboardingOverlay">
+  <div class="onboarding-wrap">
+    <div class="onboarding-header">
+      <img src="logo_subx.svg" alt="SUBX">
+      <h1>Créez votre espace <span style="color:var(--green);">Organisateur</span></h1>
+      <p>Quelques informations sur votre organisation pour finaliser votre espace.<br>Cela ne prend que 2 minutes.</p>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="onboarding-steps" id="obSteps">
+      <div class="ob-step"><div class="ob-circle active" id="ob-c1">1</div><div class="ob-label active" id="ob-l1">Type</div></div>
+      <div class="ob-connector" id="ob-conn1"></div>
+      <div class="ob-step"><div class="ob-circle" id="ob-c2">2</div><div class="ob-label" id="ob-l2">Organisation</div></div>
+      <div class="ob-connector" id="ob-conn2"></div>
+      <div class="ob-step"><div class="ob-circle" id="ob-c3">3</div><div class="ob-label" id="ob-l3">Présentation</div></div>
+    </div>
+
+    <!-- STEP 1 : Type d'organisation -->
+    <div id="obStep1">
+      <div class="ob-card">
+        <div class="ob-card-title">Quel type d'organisation représentez-vous ?</div>
+        <div class="ob-card-sub">Choisissez le statut qui vous correspond le mieux</div>
+        <div class="org-type-grid">
+          <button type="button" class="org-type-btn" data-type="association" onclick="selectOrgType(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Association / Fédération
+            <span class="org-type-sub">Loi 1901, fédération sportive</span>
+          </button>
+          <button type="button" class="org-type-btn" data-type="club" onclick="selectOrgType(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            Club sportif
+            <span class="org-type-sub">Club amateur ou professionnel</span>
+          </button>
+          <button type="button" class="org-type-btn" data-type="entreprise" onclick="selectOrgType(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            Entreprise
+            <span class="org-type-sub">SAS, SARL, SA, auto-entrepreneur</span>
+          </button>
+          <button type="button" class="org-type-btn" data-type="particulier" onclick="selectOrgType(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Particulier
+            <span class="org-type-sub">Organisation à titre personnel</span>
+          </button>
+        </div>
+        <div class="ob-error" id="obErr1"></div>
+      </div>
+      <div class="ob-nav">
+        <div></div>
+        <button class="btn btn-primary" onclick="obNext(2)">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 : Infos organisation -->
+    <div id="obStep2" style="display:none;">
+      <div class="ob-card">
+        <div class="ob-card-title">Informations de votre organisation</div>
+        <div class="ob-card-sub">Ces informations seront affichées sur vos événements</div>
+        <div class="form-grid">
+          <div class="form-group form-full">
+            <label class="form-label">Nom de l'organisation <span>*</span></label>
+            <input type="text" class="form-input" id="ob_org_name" placeholder="Ex : Trail Alpes Events">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Téléphone <span>*</span></label>
+            <input type="tel" class="form-input" id="ob_phone" placeholder="+33 6 …">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ville <span>*</span></label>
+            <input type="text" class="form-input" id="ob_city" placeholder="Ex : Grenoble">
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Adresse</label>
+            <input type="text" class="form-input" id="ob_address" placeholder="Adresse complète">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Site web</label>
+            <input type="url" class="form-input" id="ob_website" placeholder="https://…">
+          </div>
+          <div class="form-group" id="siretGroup">
+            <label class="form-label">SIRET / SIREN</label>
+            <input type="text" class="form-input" id="ob_siret" placeholder="Ex : 123 456 789 00010">
+          </div>
+        </div>
+        <div class="ob-error" id="obErr2"></div>
+      </div>
+      <div class="ob-nav">
+        <button class="btn btn-outline" onclick="obNext(1)">← Retour</button>
+        <button class="btn btn-primary" onclick="obNext(3)">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 : Présentation & expérience -->
+    <div id="obStep3" style="display:none;">
+      <div class="ob-card">
+        <div class="ob-card-title">Votre expérience & présentation</div>
+        <div class="ob-card-sub">Aidez les athlètes à vous connaître</div>
+        <div class="form-grid">
+          <div class="form-group form-full">
+            <label class="form-label">Combien d'événements avez-vous déjà organisé ?</label>
+            <select class="form-select" id="ob_events_count">
+              <option value="0">C'est mon premier événement</option>
+              <option value="1-5">Entre 1 et 5 événements</option>
+              <option value="5-20">Entre 5 et 20 événements</option>
+              <option value="20+">Plus de 20 événements</option>
+            </select>
+          </div>
+          <div class="form-group form-full">
+            <label class="form-label">Présentation de votre organisation</label>
+            <textarea class="form-textarea" id="ob_description" placeholder="Décrivez votre organisation, vos valeurs, vos événements phares…" style="min-height:120px;"></textarea>
+          </div>
+        </div>
+        <div class="ob-error" id="obErr3"></div>
+      </div>
+      <div class="ob-nav">
+        <button class="btn btn-outline" onclick="obNext(2)">← Retour</button>
+        <button class="btn btn-primary" id="obSubmitBtn" onclick="submitOnboarding()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><polyline points="20 6 9 17 4 12"/></svg>
+          Créer mon espace organisateur
+        </button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="ob-success" id="obSuccess" style="display:none;">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+      <h2>Espace organisateur créé !</h2>
+      <p id="obSuccessOrgName" style="color:var(--green);font-weight:700;font-size:1rem;margin-bottom:8px;"></p>
+      <p>Votre espace est prêt. Vous pouvez maintenant créer et publier vos événements sur SUBX.</p>
+      <button class="btn btn-primary" onclick="enterDashboard()">Accéder à mon dashboard →</button>
+    </div>
+  </div>
 </div>
 
 <div class="layout" id="mainLayout">
@@ -747,25 +945,56 @@
 
     currentUser = session.user;
     let { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
-
-    // Si pas encore organisateur → on lui accorde le rôle automatiquement
-    if (!profile?.is_organizer) {
-      await sb.from('profiles').update({ is_organizer: true }).eq('id', currentUser.id);
-      profile = { ...profile, is_organizer: true };
-    }
     currentProfile = profile;
 
-    const displayName = profile?.full_name || currentUser.user_metadata?.full_name || currentUser.email;
-    document.getElementById('sidebarName').textContent = displayName;
-    document.getElementById('sidebarAvatar').textContent = displayName.charAt(0).toUpperCase();
-    if (profile?.avatar_url) document.getElementById('sidebarAvatar').innerHTML = `<img src="${profile.avatar_url}" alt="avatar">`;
-    fillProfileForm(profile);
-    guard.style.display = 'none';
+    // Vérifier si le profil organisateur existe dans la table organizers
+    const { data: orgProfile } = await sb.from('organizers').select('*').eq('user_id', currentUser.id).single();
+
     document.getElementById('authModal').classList.remove('active');
+    guard.style.display = 'none';
+
+    if (!orgProfile) {
+      // Afficher l'onboarding
+      const displayName = profile?.full_name || currentUser.user_metadata?.full_name || '';
+      const firstName = displayName.split(' ')[0];
+      if (firstName) {
+        document.querySelector('.onboarding-header p').innerHTML =
+          `Bonjour <span class="welcome-name">${firstName}</span> ! Quelques informations sur votre organisation pour finaliser votre espace.<br>Cela ne prend que 2 minutes.`;
+      }
+      // Si athlète existant, pré-remplir ce qu'on a
+      if (profile?.city) document.getElementById('ob_city').value = profile.city;
+      if (profile?.org_name) document.getElementById('ob_org_name').value = profile.org_name;
+      if (profile?.phone) document.getElementById('ob_phone').value = profile.phone;
+      if (profile?.org_website) document.getElementById('ob_website').value = profile.org_website;
+      document.getElementById('onboardingOverlay').classList.add('active');
+      return;
+    }
+
+    // Profil organisateur trouvé → enter dashboard
+    await enterDashboard();
+  }
+
+  window.enterDashboard = async function() {
+    document.getElementById('onboardingOverlay').classList.remove('active');
+
+    // S'assurer que is_organizer = true sur le profile
+    if (!currentProfile?.is_organizer) {
+      await sb.from('profiles').update({ is_organizer: true }).eq('id', currentUser.id);
+      currentProfile = { ...currentProfile, is_organizer: true };
+    }
+
+    const { data: orgProfile } = await sb.from('organizers').select('*').eq('user_id', currentUser.id).single();
+    const displayName = orgProfile?.org_name || currentProfile?.full_name || currentUser.user_metadata?.full_name || currentUser.email;
+    const initials = (currentProfile?.full_name || currentUser.email).charAt(0).toUpperCase();
+
+    document.getElementById('sidebarName').textContent = orgProfile?.org_name || currentProfile?.full_name || currentUser.email;
+    document.getElementById('sidebarAvatar').textContent = initials;
+    if (currentProfile?.avatar_url) document.getElementById('sidebarAvatar').innerHTML = `<img src="${currentProfile.avatar_url}" alt="avatar">`;
+    fillProfileForm(currentProfile, orgProfile);
     document.getElementById('mainLayout').classList.add('ready');
     setupFormatCheckboxes();
     await loadEvents();
-  }
+  };
 
   /* ============================
      AUTH MODAL FUNCTIONS
@@ -870,6 +1099,93 @@
       }
     }
   });
+
+  /* ============================
+     ONBOARDING
+  ============================ */
+  let selectedOrgType = null;
+  let obCurrentStep = 1;
+
+  window.selectOrgType = function(btn) {
+    document.querySelectorAll('.org-type-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedOrgType = btn.dataset.type;
+    // Cacher SIRET pour les particuliers
+    document.getElementById('siretGroup').style.display = selectedOrgType === 'particulier' ? 'none' : '';
+  };
+
+  window.obNext = function(step) {
+    // Validation
+    if (obCurrentStep === 1 && step > 1) {
+      if (!selectedOrgType) { document.getElementById('obErr1').textContent = 'Veuillez sélectionner un type d\'organisation.'; return; }
+      document.getElementById('obErr1').textContent = '';
+    }
+    if (obCurrentStep === 2 && step > 2) {
+      const orgName = document.getElementById('ob_org_name').value.trim();
+      const phone = document.getElementById('ob_phone').value.trim();
+      const city = document.getElementById('ob_city').value.trim();
+      if (!orgName) { document.getElementById('obErr2').textContent = 'Le nom de l\'organisation est obligatoire.'; return; }
+      if (!phone) { document.getElementById('obErr2').textContent = 'Le téléphone est obligatoire.'; return; }
+      if (!city) { document.getElementById('obErr2').textContent = 'La ville est obligatoire.'; return; }
+      document.getElementById('obErr2').textContent = '';
+    }
+    obCurrentStep = step;
+    for (let i = 1; i <= 3; i++) {
+      const s = document.getElementById(`obStep${i}`);
+      if (s) s.style.display = i === step ? '' : 'none';
+      const c = document.getElementById(`ob-c${i}`);
+      const l = document.getElementById(`ob-l${i}`);
+      if (c && l) {
+        c.className = 'ob-circle' + (i < step ? ' done' : i === step ? ' active' : '');
+        l.className = 'ob-label' + (i < step ? ' done' : i === step ? ' active' : '');
+        c.textContent = i < step ? '✓' : String(i);
+      }
+      if (i < 3) {
+        const conn = document.getElementById(`ob-conn${i}`);
+        if (conn) conn.className = 'ob-connector' + (i < step ? ' done' : '');
+      }
+    }
+    document.getElementById('onboardingOverlay').scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  window.submitOnboarding = async function() {
+    const btn = document.getElementById('obSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="width:15px;height:15px;border-width:2px;"></div> Création…';
+    document.getElementById('obErr3').textContent = '';
+
+    const payload = {
+      user_id: currentUser.id,
+      org_name: document.getElementById('ob_org_name').value.trim(),
+      org_type: selectedOrgType,
+      phone: document.getElementById('ob_phone').value.trim(),
+      city: document.getElementById('ob_city').value.trim(),
+      address: document.getElementById('ob_address').value.trim() || null,
+      website: document.getElementById('ob_website').value.trim() || null,
+      siret: document.getElementById('ob_siret').value.trim() || null,
+      events_count: document.getElementById('ob_events_count').value,
+      description: document.getElementById('ob_description').value.trim() || null,
+      status: 'active',
+    };
+
+    const { error } = await sb.from('organizers').upsert(payload, { onConflict: 'user_id' });
+
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><polyline points="20 6 9 17 4 12"/></svg> Créer mon espace organisateur';
+
+    if (error) { document.getElementById('obErr3').textContent = 'Erreur : ' + error.message; return; }
+
+    // Marquer comme organisateur dans profiles
+    await sb.from('profiles').update({ is_organizer: true, org_name: payload.org_name, org_website: payload.website, phone: payload.phone }).eq('id', currentUser.id);
+    currentProfile = { ...currentProfile, is_organizer: true };
+
+    // Afficher succès
+    document.getElementById('obSteps').style.display = 'none';
+    document.getElementById('obStep3').style.display = 'none';
+    document.getElementById('obSuccessOrgName').textContent = payload.org_name;
+    document.getElementById('obSuccess').style.display = 'block';
+  };
 
   window.showPage = function(name) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1119,17 +1435,17 @@
     await loadEvents();
   };
 
-  function fillProfileForm(profile) {
-    if (!profile) return;
-    const fullName = profile.full_name || '';
+  function fillProfileForm(profile, orgProfile) {
+    const fullName = profile?.full_name || '';
     const parts = fullName.split(' ');
     document.getElementById('p_first_name').value = parts[0] || '';
     document.getElementById('p_last_name').value = parts.slice(1).join(' ') || '';
-    document.getElementById('p_org_name').value = profile.org_name || '';
-    document.getElementById('p_org_website').value = profile.org_website || '';
-    document.getElementById('p_phone').value = profile.phone || '';
+    // Priorité : données de la table organizers
+    document.getElementById('p_org_name').value = orgProfile?.org_name || profile?.org_name || '';
+    document.getElementById('p_org_website').value = orgProfile?.website || profile?.org_website || '';
+    document.getElementById('p_phone').value = orgProfile?.phone || profile?.phone || '';
     document.getElementById('p_email').value = currentUser?.email || '';
-    if (profile.avatar_url) document.getElementById('profileAvatar').innerHTML = `<img src="${profile.avatar_url}" alt="avatar">`;
+    if (profile?.avatar_url) document.getElementById('profileAvatar').innerHTML = `<img src="${profile.avatar_url}" alt="avatar">`;
     else document.getElementById('profileAvatar').textContent = (fullName || currentUser?.email || '?').charAt(0).toUpperCase();
   }
 
@@ -1137,9 +1453,17 @@
     const firstName = document.getElementById('p_first_name').value.trim();
     const lastName = document.getElementById('p_last_name').value.trim();
     const fullName = [firstName, lastName].filter(Boolean).join(' ');
-    const { error } = await sb.from('profiles').update({ full_name: fullName, org_name: document.getElementById('p_org_name').value.trim() || null, org_website: document.getElementById('p_org_website').value.trim() || null, phone: document.getElementById('p_phone').value.trim() || null }).eq('id', currentUser.id);
-    if (error) { showToast('Erreur lors de la sauvegarde', 'error'); return; }
-    document.getElementById('sidebarName').textContent = fullName || currentUser.email;
+    const orgName = document.getElementById('p_org_name').value.trim() || null;
+    const orgWebsite = document.getElementById('p_org_website').value.trim() || null;
+    const phone = document.getElementById('p_phone').value.trim() || null;
+
+    // Mise à jour simultanée profiles + organizers
+    const [r1, r2] = await Promise.all([
+      sb.from('profiles').update({ full_name: fullName, org_name: orgName, org_website: orgWebsite, phone }).eq('id', currentUser.id),
+      sb.from('organizers').update({ org_name: orgName, website: orgWebsite, phone }).eq('user_id', currentUser.id),
+    ]);
+    if (r1.error) { showToast('Erreur lors de la sauvegarde', 'error'); return; }
+    document.getElementById('sidebarName').textContent = orgName || fullName || currentUser.email;
     document.getElementById('sidebarAvatar').textContent = (fullName || currentUser.email).charAt(0).toUpperCase();
     showToast('Profil mis à jour !', 'success');
   };

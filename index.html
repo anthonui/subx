@@ -1138,7 +1138,7 @@
     }
 
     .auth-form { display: flex; flex-direction: column; gap: 14px; }
-    .auth-form.hidden { display: none; }
+    .auth-form.hidden, .hidden { display: none; }
 
     .auth-field {
       display: flex;
@@ -1722,7 +1722,12 @@
       });
 
       // Écoute les changements d'état auth (confirmation email, login, logout)
-      sb.auth.onAuthStateChange(async (_event, session) => {
+      sb.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          openAuthModal();
+          switchTab('reset');
+          return;
+        }
         if (session) await syncGoogleAvatar(session.user);
         await updateNavAvatar(session);
       });
@@ -1824,10 +1829,21 @@
 
     function switchTab(tab) {
       const isLogin = tab === 'login';
+      const isSignup = tab === 'signup';
+      const isForgot = tab === 'forgot';
+      const isReset = tab === 'reset';
+      const isStandard = isLogin || isSignup;
+
+      document.getElementById('authTabs').classList.toggle('hidden', !isStandard);
+      document.getElementById('btnGoogle').classList.toggle('hidden', !isStandard);
+      document.getElementById('authDivider').classList.toggle('hidden', !isStandard);
+
       document.getElementById('tabLogin').classList.toggle('active', isLogin);
-      document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+      document.getElementById('tabSignup').classList.toggle('active', isSignup);
       document.getElementById('formLogin').classList.toggle('hidden', !isLogin);
-      document.getElementById('formSignup').classList.toggle('hidden', isLogin);
+      document.getElementById('formSignup').classList.toggle('hidden', !isSignup);
+      document.getElementById('formForgot').classList.toggle('hidden', !isForgot);
+      document.getElementById('formReset').classList.toggle('hidden', !isReset);
       setAuthMessage('', '');
     }
 
@@ -1897,6 +1913,73 @@
       if (error) setAuthMessage('Erreur lors de la connexion Google.', 'error');
     }
 
+    async function handleForgotPassword(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnForgot');
+      btn.disabled = true;
+      btn.textContent = 'Envoi…';
+      setAuthMessage('', '');
+
+      const email = document.getElementById('forgotEmail').value.trim();
+      const redirectTo = window.location.origin;
+
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+
+      btn.disabled = false;
+      btn.textContent = 'Envoyer le lien';
+
+      if (error) {
+        setAuthMessage('Erreur lors de l\'envoi. Vérifie ton email.', 'error');
+      } else {
+        setAuthMessage('Email envoyé ! Vérifie ta boîte mail.', 'success');
+      }
+    }
+
+    async function handleResetPassword(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnReset');
+      const password = document.getElementById('resetPassword').value;
+      const confirm = document.getElementById('resetPasswordConfirm').value;
+
+      if (password !== confirm) {
+        setAuthMessage('Les mots de passe ne correspondent pas.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Mise à jour…';
+      setAuthMessage('', '');
+
+      const { data, error } = await sb.auth.updateUser({ password });
+
+      if (error) {
+        btn.disabled = false;
+        btn.textContent = 'Mettre à jour';
+        setAuthMessage('Erreur lors de la mise à jour. Réessaie.', 'error');
+        return;
+      }
+
+      // Envoi email de confirmation "mot de passe modifié"
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.access_token) {
+          await fetch('https://ipuryomreqlrhhutjnkq.supabase.co/functions/v1/notify-password-changed', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+        }
+      } catch (_) { /* L'email de confirmation est optionnel */ }
+
+      setAuthMessage('Mot de passe mis à jour ! Redirection…', 'success');
+      setTimeout(() => {
+        closeAuthModal();
+        window.location.href = 'profil.html';
+      }, 1500);
+    }
+
     // Fermer avec Escape
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') closeAuthModal();
@@ -1913,7 +1996,7 @@
       <img src="logo_subx_dark.svg" alt="SUBX" class="auth-logo">
       <p class="auth-tagline">Trouve et réserve ta prochaine course hybride</p>
 
-      <div class="auth-tabs">
+      <div class="auth-tabs" id="authTabs">
         <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Connexion</button>
         <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Inscription</button>
       </div>
@@ -1921,12 +2004,12 @@
       <p class="auth-message" id="authMessage"></p>
 
       <!-- Google -->
-      <button type="button" class="btn-google" onclick="handleGoogleAuth()">
+      <button type="button" class="btn-google" id="btnGoogle" onclick="handleGoogleAuth()">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         Continuer avec Google
       </button>
 
-      <div class="auth-divider">ou</div>
+      <div class="auth-divider" id="authDivider">ou</div>
 
       <!-- Login form -->
       <form class="auth-form" id="formLogin" onsubmit="handleLogin(event)">
@@ -1939,6 +2022,7 @@
           <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
         </div>
         <button type="submit" class="auth-submit" id="btnLogin">Se connecter</button>
+        <button type="button" onclick="switchTab('forgot')" style="background:none;border:none;color:rgba(0,0,0,0.4);font-size:0.75rem;cursor:pointer;text-align:center;font-family:'Montserrat',sans-serif;margin-top:-6px;">Mot de passe oublié ?</button>
       </form>
 
       <!-- Signup form -->
@@ -1956,6 +2040,36 @@
           <input type="password" id="signupPassword" placeholder="8 caractères minimum" required minlength="8" autocomplete="new-password">
         </div>
         <button type="submit" class="auth-submit" id="btnSignup">Créer mon compte</button>
+      </form>
+
+      <!-- Forgot password form -->
+      <form class="auth-form hidden" id="formForgot" onsubmit="handleForgotPassword(event)">
+        <div style="margin-bottom:12px;">
+          <button type="button" onclick="switchTab('login')" style="background:none;border:none;color:rgba(0,0,0,0.4);font-size:0.8rem;cursor:pointer;font-family:'Montserrat',sans-serif;padding:0;display:flex;align-items:center;gap:4px;margin-bottom:10px;">← Retour à la connexion</button>
+          <p style="font-size:0.82rem;color:rgba(0,0,0,0.55);line-height:1.5;">Saisis ton adresse email et on t'envoie un lien pour réinitialiser ton mot de passe.</p>
+        </div>
+        <div class="auth-field">
+          <label for="forgotEmail">Email</label>
+          <input type="email" id="forgotEmail" placeholder="ton@email.com" required autocomplete="email">
+        </div>
+        <button type="submit" class="auth-submit" id="btnForgot">Envoyer le lien</button>
+      </form>
+
+      <!-- Reset password form (shown after clicking email link) -->
+      <form class="auth-form hidden" id="formReset" onsubmit="handleResetPassword(event)">
+        <div style="margin-bottom:12px;">
+          <h3 style="font-size:1rem;font-weight:700;color:var(--black);margin-bottom:4px;">Nouveau mot de passe</h3>
+          <p style="font-size:0.82rem;color:rgba(0,0,0,0.55);line-height:1.5;">Choisis un nouveau mot de passe sécurisé pour ton compte.</p>
+        </div>
+        <div class="auth-field">
+          <label for="resetPassword">Nouveau mot de passe</label>
+          <input type="password" id="resetPassword" placeholder="8 caractères minimum" required minlength="8" autocomplete="new-password">
+        </div>
+        <div class="auth-field">
+          <label for="resetPasswordConfirm">Confirmer</label>
+          <input type="password" id="resetPasswordConfirm" placeholder="••••••••" required minlength="8" autocomplete="new-password">
+        </div>
+        <button type="submit" class="auth-submit" id="btnReset">Mettre à jour</button>
       </form>
     </div>
   </div>

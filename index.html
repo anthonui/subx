@@ -1015,10 +1015,13 @@
       .footer-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
+    .mobile-nav-actions { display: none; align-items: center; gap: 4px; }
+
     @media (max-width: 768px) {
       .navbar-links,
       .navbar-right { display: none; }
       .hamburger { display: block; }
+      .mobile-nav-actions { display: flex; }
 
       .section-title { font-size: 1.6rem; }
 
@@ -1293,7 +1296,15 @@
         </button>
       </div>
 
-      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
+      <div class="mobile-nav-actions">
+        <button class="navbar-icon" id="btnProfilMobile" aria-label="Profil">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+        <button class="navbar-avatar" id="navAvatarMobile" aria-label="Mon profil" onclick="window.location.href='profil.html'" style="display:none;">
+          <div class="navbar-avatar-initials" id="navAvatarInitialsMobile"></div>
+        </button>
+        <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
+      </div>
     </div>
 
     <div class="mobile-menu" id="mobileMenu">
@@ -1758,6 +1769,12 @@
         else openAuthModal();
       });
 
+      document.getElementById('btnProfilMobile').addEventListener('click', async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) window.location.href = 'profil.html';
+        else openAuthModal();
+      });
+
       // Écoute les changements d'état auth (confirmation email, login, logout)
       sb.auth.onAuthStateChange(async (event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
@@ -1830,26 +1847,39 @@
       const btnProfil = document.getElementById('btnProfil');
       const navAvatar = document.getElementById('navAvatar');
       const navAvatarInitials = document.getElementById('navAvatarInitials');
+      const btnProfilMobile = document.getElementById('btnProfilMobile');
+      const navAvatarMobile = document.getElementById('navAvatarMobile');
+      const navAvatarInitialsMobile = document.getElementById('navAvatarInitialsMobile');
 
       if (session && session.user) {
         const user = session.user;
         const name = user.user_metadata?.full_name || user.email || '';
         const initials = name.trim().split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
 
-        // Récupère l'avatar depuis profiles
         const { data: profile } = await sb.from('profiles').select('avatar_url').eq('id', user.id).single();
+        const avatarHtml = profile?.avatar_url
+          ? `<img src="${profile.avatar_url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+          : (initials || '?');
 
         if (profile?.avatar_url) {
-          navAvatarInitials.innerHTML = `<img src="${profile.avatar_url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          navAvatarInitials.innerHTML = avatarHtml;
+          navAvatarInitialsMobile.innerHTML = avatarHtml;
         } else {
           navAvatarInitials.textContent = initials || '?';
+          navAvatarInitialsMobile.textContent = initials || '?';
         }
 
         btnProfil.style.display = 'none';
         navAvatar.classList.add('visible');
+        btnProfilMobile.style.display = 'none';
+        navAvatarMobile.style.display = '';
+        navAvatarMobile.classList.add('visible');
       } else {
         btnProfil.style.display = '';
         navAvatar.classList.remove('visible');
+        btnProfilMobile.style.display = '';
+        navAvatarMobile.style.display = 'none';
+        navAvatarMobile.classList.remove('visible');
       }
     }
 

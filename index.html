@@ -191,10 +191,11 @@
       background: none;
       border: none;
       color: var(--white);
-      font-size: 1.5rem;
+      font-size: 1.875rem;
       cursor: pointer;
       line-height: 1;
       padding: 0;
+      vertical-align: middle;
     }
 
     .mobile-menu {
@@ -1017,7 +1018,7 @@
       .footer-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
-    .mobile-nav-actions { display: none; align-items: center; gap: 12px; }
+    .mobile-nav-actions { display: none; align-items: center; justify-content: center; gap: 12px; }
 
     @media (max-width: 768px) {
       .navbar-links,
@@ -1300,7 +1301,7 @@
 
       <div class="mobile-nav-actions">
         <button class="navbar-icon" id="btnProfilMobile" aria-label="Profil">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </button>
         <button class="navbar-avatar" id="navAvatarMobile" aria-label="Mon profil" onclick="window.location.href='profil.html'" style="display:none;">
           <div class="navbar-avatar-initials" id="navAvatarInitialsMobile"></div>

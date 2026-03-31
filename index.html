@@ -1311,6 +1311,7 @@
         <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
           <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
+
       </div>
     </div>
 
@@ -1689,12 +1690,17 @@
     }
 
     // ===== MOBILE MENU =====
+    const ICON_BURGER = `<svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`;
+    const ICON_CLOSE  = `<svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
     function toggleMobileMenu() {
-      document.getElementById('mobileMenu').classList.toggle('active');
+      const isOpen = document.getElementById('mobileMenu').classList.toggle('active');
+      document.querySelector('.hamburger').innerHTML = isOpen ? ICON_CLOSE : ICON_BURGER;
     }
 
     function closeMobileMenu() {
       document.getElementById('mobileMenu').classList.remove('active');
+      document.querySelector('.hamburger').innerHTML = ICON_BURGER;
     }
 
     // ===== COUNTER ANIMATION =====

@@ -1761,6 +1761,11 @@
       if (session) {
         await syncGoogleAvatar(session.user);
         await updateNavAvatar(session);
+        // Callback OAuth : on redirige vers le bon dashboard
+        if (window.location.search.includes('code=') || window.location.hash.includes('access_token')) {
+          const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+          window.location.href = (profile?.role === 'organizer') ? 'organisateur.html' : 'profil.html';
+        }
       }
     }
 
@@ -2014,7 +2019,7 @@
     async function handleGoogleAuth() {
       const { error } = await sb.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin + '/profil.html' }
+        options: { redirectTo: window.location.origin + '/index.html' }
       });
       if (error) setAuthMessage('Erreur lors de la connexion Google.', 'error');
     }

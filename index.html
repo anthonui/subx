@@ -1109,12 +1109,14 @@
     }
 
     .account-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .account-type-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 12px; border: 2px solid rgba(255,255,255,0.08); border-radius: 14px; background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.2s; color: rgba(255,255,255,0.5); font-family: 'Montserrat',sans-serif; font-size: 0.8rem; font-weight: 600; text-align: center; }
-    .account-type-btn svg { width: 32px; height: 32px; color: rgba(255,255,255,0.3); transition: color 0.2s; margin-bottom: 2px; }
-    .account-type-btn span.sub { font-size: 0.65rem; color: rgba(255,255,255,0.25); font-weight: 400; }
-    .account-type-btn:hover { border-color: rgba(124,185,40,0.4); color: rgba(255,255,255,0.8); }
-    .account-type-btn.selected { border-color: #7CB928; background: rgba(124,185,40,0.1); color: #7CB928; }
+    .account-type-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px 12px; border: 2px solid #e0e0e0; border-radius: 14px; background: #f7f7f7; cursor: pointer; transition: all 0.2s; color: #444; font-family: 'Montserrat',sans-serif; font-size: 0.82rem; font-weight: 600; text-align: center; width: 100%; }
+    .account-type-btn svg { width: 32px; height: 32px; color: #888; transition: color 0.2s; margin-bottom: 2px; }
+    .account-type-btn span.sub { font-size: 0.65rem; color: #999; font-weight: 400; }
+    .account-type-btn:hover { border-color: #7CB928; background: rgba(124,185,40,0.06); color: #3a3a3a; }
+    .account-type-btn:hover svg { color: #7CB928; }
+    .account-type-btn.selected { border-color: #7CB928; background: rgba(124,185,40,0.1); color: #4a7a10; }
     .account-type-btn.selected svg { color: #7CB928; }
+    .account-type-btn.selected span.sub { color: #6a9a30; }
 
     .auth-tabs {
       display: flex;

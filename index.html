@@ -1108,28 +1108,16 @@
       margin-bottom: 28px;
     }
 
-    .account-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .account-type-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px 12px; border: 2px solid #e0e0e0; border-radius: 14px; background: transparent; cursor: pointer; transition: border-color 0.3s, color 0.3s; color: #444; font-family: 'Montserrat',sans-serif; font-size: 0.82rem; font-weight: 600; text-align: center; width: 100%; position: relative; overflow: hidden; }
-    /* Image layer (en dessous) */
-    .account-type-btn::before { content: ''; position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 0; }
-    .account-type-btn[data-type="athlete"]::before { background-image: url('https://images.unsplash.com/photo-1533681904393-9ab6eee7e408?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGNyb3NzZml0fGVufDB8fDB8fHww'); }
-    .account-type-btn[data-type="organization"]::before { background-image: url('https://images.unsplash.com/photo-1682531024803-376c7dfd7975?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); }
-    /* Overlay blanc (subtil au repos, sombre au hover) */
-    .account-type-btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.88); transition: background 0.35s ease; z-index: 1; }
-    /* Contenu au-dessus des overlays */
-    .account-type-btn svg, .account-type-btn .btn-label, .account-type-btn .sub { position: relative; z-index: 2; }
-    .account-type-btn svg { width: 32px; height: 32px; color: #777; transition: color 0.3s; margin-bottom: 2px; }
+    .account-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+    .account-type-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 22px 12px; border: 2px solid #e0e0e0; border-radius: 14px; background: #f7f7f7; cursor: pointer; transition: border-color 0.2s, background 0.2s; color: #333; font-family: 'Montserrat',sans-serif; font-size: 0.82rem; font-weight: 700; text-align: center; width: 100%; }
+    .account-type-btn svg { width: 32px; height: 32px; stroke: #7CB928; transition: transform 0.2s; margin-bottom: 2px; }
+    .account-type-btn .btn-label { font-size: 0.82rem; font-weight: 700; color: #333; }
     .account-type-btn .sub { font-size: 0.65rem; color: #999; font-weight: 400; }
-    /* Hover : image plus présente, texte blanc */
-    .account-type-btn:hover { border-color: transparent; color: #fff; }
-    .account-type-btn:hover::after { background: rgba(0,0,0,0.38); }
-    .account-type-btn:hover svg { color: #fff; }
-    .account-type-btn:hover .sub { color: rgba(255,255,255,0.75); }
-    /* Sélectionné */
-    .account-type-btn.selected { border-color: #7CB928; color: #fff; }
-    .account-type-btn.selected::after { background: rgba(40,80,5,0.58); }
-    .account-type-btn.selected svg { color: #c5e87a; }
-    .account-type-btn.selected .sub { color: rgba(255,255,255,0.8); }
+    .account-type-btn:hover { border-color: #7CB928; background: rgba(124,185,40,0.06); }
+    .account-type-btn:hover svg { transform: scale(1.1); }
+    .account-type-btn.selected { border-color: #7CB928; background: rgba(124,185,40,0.08); }
+    .account-type-btn.selected .btn-label { color: #4a7a10; }
+    .account-type-btn.selected .sub { color: #7CB928; }
 
     .auth-tabs {
       display: flex;
@@ -2188,7 +2176,8 @@
       <!-- Signup form -->
       <form class="auth-form hidden" id="formSignup" onsubmit="handleSignup(event)">
       <div id="signupTypeStep">
-        <div style="font-size:0.8rem;font-weight:600;color:rgba(255,255,255,0.6);margin-bottom:12px;">Je m'inscris en tant que…</div>
+        <div style="font-size:0.8rem;font-weight:700;color:#1a1a1a;margin-bottom:4px;">Je m'inscris en tant que…</div>
+        <div style="font-size:0.72rem;color:#999;margin-bottom:14px;font-family:'Montserrat',sans-serif;">Tu pourras modifier ça dans ton profil.</div>
         <div class="account-type-grid">
           <button type="button" class="account-type-btn" data-type="athlete" onclick="selectAccountType(this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>

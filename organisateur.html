@@ -108,6 +108,9 @@
     .form-input, .form-select, .form-textarea { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; outline: none; transition: border-color 0.2s; width: 100%; }
     .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--green); background: rgba(124,185,40,0.04); }
     .form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.2); }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
     .form-select option { background: var(--dark); }
     .form-textarea { resize: vertical; min-height: 100px; }
     .form-hint { font-size: 0.68rem; color: rgba(255,255,255,0.25); margin-top: 2px; }
@@ -137,15 +140,15 @@
     .ms-item.selected .ms-checkmark { opacity: 1; }
 
     /* STEPS */
-    .step-indicator { display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
+    .step-indicator { display: grid; grid-template-columns: repeat(3, 70px 72px) 70px; align-items: start; justify-content: center; margin-bottom: 32px; }
     .step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; transition: all 0.3s; border: 2px solid rgba(255,255,255,0.1); background: var(--dark); color: rgba(255,255,255,0.3); position: relative; z-index: 1; }
     .step-circle.done { background: var(--green); border-color: var(--green); color: #fff; }
     .step-circle.active { border-color: var(--green); color: var(--green); background: rgba(124,185,40,0.1); }
-    .step-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.25); white-space: nowrap; }
+    .step-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.25); white-space: nowrap; text-align: center; }
     .step-label.active { color: var(--green); }
     .step-label.done { color: rgba(255,255,255,0.5); }
-    .step-connector { width: 80px; height: 2px; background: rgba(255,255,255,0.1); margin-bottom: 24px; transition: background 0.3s; flex-shrink: 0; }
+    .step-connector { width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin-top: 17px; transition: background 0.3s; }
     .step-connector.done { background: var(--green); }
 
     /* FORMAT CHECKBOXES */
@@ -159,12 +162,22 @@
 
     /* PRICES */
     .prices-table { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
-    .price-row { display: grid; grid-template-columns: 1fr 1fr 36px; gap: 10px; align-items: center; animation: slideIn 0.25s ease; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-    .price-row-label { font-size: 0.78rem; color: rgba(255,255,255,0.6); font-weight: 500; }
     .btn-remove-price { width: 32px; height: 32px; border-radius: 8px; background: rgba(229,57,53,0.1); border: 1px solid rgba(229,57,53,0.2); color: #E57373; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
     .btn-remove-price:hover { background: rgba(229,57,53,0.25); }
     .btn-remove-price svg { width: 14px; height: 14px; pointer-events: none; }
+    /* Price blocks (format + levels + rows) */
+    .price-block { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; animation: slideIn 0.25s ease; }
+    .price-block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .price-block-title { font-size: 0.88rem; font-weight: 700; color: var(--white); }
+    .price-levels-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 9px; display: block; }
+    .plvl-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 7px; }
+    .price-rows-container { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+    .price-rows-header { display: grid; grid-template-columns: 1fr 1fr 36px; gap: 10px; padding: 0 2px; margin-bottom: 2px; }
+    .price-rows-header span { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.25); font-weight: 600; }
+    .price-row { display: grid; grid-template-columns: 1fr 1fr 36px; gap: 10px; align-items: center; animation: slideIn 0.2s ease; }
+    .price-row-label { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: rgba(255,255,255,0.6); font-weight: 500; }
+    .price-level-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
     /* COVER UPLOAD */
     .cover-upload-zone { border: 2px dashed rgba(255,255,255,0.1); border-radius: 14px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
@@ -705,7 +718,7 @@
             <div class="form-grid">
               <div class="form-group form-full">
                 <label class="form-label">Nom de l'événement <span>*</span></label>
-                <input type="text" class="form-input" id="f_name" placeholder="Ex : Trail des Alpes 2026">
+                <input type="text" class="form-input" id="f_name" placeholder="Ex : Hybrid Race 2026">
               </div>
               <div class="form-group">
                 <label class="form-label">Type de course <span>*</span></label>
@@ -1284,7 +1297,7 @@
   };
 
   async function loadEvents() {
-    const { data, error } = await sb.from('event').select('*').eq('organizer_id', currentUser.id).order('date', { ascending: false });
+    const { data, error } = await sb.from('event').select('*, ticket_type(id,format,level,price,max_spots)').eq('organizer_id', currentUser.id).order('date', { ascending: false });
     if (error) { console.error(error); return; }
     myEvents = data || [];
     renderStats();
@@ -1322,7 +1335,8 @@
     const statusClass = isPublished ? 'status-published' : 'status-draft';
     const dateStr = ev.date ? new Date(ev.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
     const cover = ev.image_url ? `<img class="event-card-cover" src="${ev.image_url}" alt="cover" onerror="this.style.display='none'">` : `<div class="event-card-cover-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
-    const formats = Array.isArray(ev.formats) ? ev.formats.slice(0,3).map(f => `<span class="chip">${f}</span>`).join('') : '';
+    const uniqueFormats = Array.isArray(ev.ticket_type) ? [...new Set(ev.ticket_type.map(t => t.format))] : [];
+    const formats = uniqueFormats.slice(0,3).map(f => `<span class="chip">${f}</span>`).join('');
     const evJson = JSON.stringify(ev).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
     return `<div class="event-card">${cover}<div class="event-card-body"><div class="event-card-name">${ev.name || '—'}</div><div class="event-card-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${dateStr}</span>${ev.city ? `<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${ev.city}</span>` : ''}${ev.race_type ? `<span>${ev.race_type}</span>` : ''}</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${formats}</div></div><div class="event-card-actions"><span class="status-badge ${statusClass}">${statusLabel}</span><div style="display:flex;flex-direction:column;gap:6px;"><button class="btn btn-outline btn-sm" onclick='openEditEvent(${evJson})'>Modifier</button><button class="btn btn-danger btn-sm" onclick="askDelete('${ev.id}')">Supprimer</button></div></div></div>`;
   }
@@ -1365,19 +1379,67 @@
     document.querySelectorAll('#formatsGrid input[type="checkbox"]').forEach(cb => cb.addEventListener('change', syncPricesTable));
   }
 
+  function safeId(str) { return str.replace(/[^a-zA-Z0-9]/g, '_'); }
+
+  function makePriceRow(fmt, lvl, fmtCbId, val) {
+    const m = LEVEL_META[lvl];
+    const key = fmt + '|' + lvl;
+    return `<div class="price-row" data-format="${fmt}" data-level="${lvl}" data-key="${key}">
+      <div class="price-row-label"><span class="price-level-dot" style="background:${m.color};box-shadow:0 0 4px ${m.color}88;"></span>${m.label}</div>
+      <input type="number" class="form-input" placeholder="Ex : 45" min="0" step="0.01" value="${val||''}">
+      <button type="button" class="btn-remove-price" onclick="uncheckPriceLevel('plvl_${safeId(key)}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>`;
+  }
+
   function syncPricesTable() {
     const checked = [...document.querySelectorAll('#formatsGrid input[type="checkbox"]:checked')];
     const table = document.getElementById('pricesTable');
-    if (!checked.length) { table.innerHTML = '<div style="font-size:0.78rem;color:rgba(255,255,255,0.25);padding:12px 0;">Sélectionnez des formats pour définir les tarifs</div>'; return; }
-    const existing = {};
-    table.querySelectorAll('.price-row').forEach(row => { const inp = row.querySelector('input'); if (inp) existing[row.dataset.format] = inp.value; });
-    table.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr 36px;gap:10px;margin-bottom:4px;padding:0 2px;"><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.07em;color:rgba(255,255,255,0.3);font-weight:600;">Format</div><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.07em;color:rgba(255,255,255,0.3);font-weight:600;">Tarif (€)</div><div></div></div>` + checked.map(cb => {
+    if (!checked.length) {
+      table.innerHTML = '<div style="font-size:0.78rem;color:rgba(255,255,255,0.25);padding:12px 0;">Sélectionnez des formats pour définir les tarifs</div>';
+      return;
+    }
+    // Preserve existing prices & selected levels
+    const existingPrices = {};
+    table.querySelectorAll('.price-row[data-key]').forEach(row => { const inp = row.querySelector('input'); if (inp?.value) existingPrices[row.dataset.key] = inp.value; });
+    const existingLevels = {};
+    table.querySelectorAll('.price-block').forEach(block => {
+      existingLevels[block.dataset.format] = [...block.querySelectorAll('.plvl-check input:checked')].map(cb => cb.value);
+    });
+
+    table.innerHTML = checked.map(cb => {
       const fmt = cb.value;
-      return `<div class="price-row" data-format="${fmt}"><div class="price-row-label">${fmt}</div><input type="number" class="form-input" placeholder="Ex : 45" min="0" step="0.01" value="${existing[fmt]||''}"><button type="button" class="btn-remove-price" onclick="uncheckFormat('${cb.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
+      const selLevels = existingLevels[fmt] || [];
+      const levelChecks = Object.entries(LEVEL_META).map(([val, m]) => {
+        const sid = 'plvl_' + safeId(fmt + '|' + val);
+        const chk = selLevels.includes(val) ? 'checked' : '';
+        return `<div class="format-check plvl-check"><input type="checkbox" id="${sid}" value="${val}" ${chk} onchange="togglePriceLevel('${fmt}','${val}',this,'${cb.id}')"><label for="${sid}">${m.label}</label></div>`;
+      }).join('');
+      const priceRows = selLevels.map(lvl => makePriceRow(fmt, lvl, cb.id, existingPrices[fmt + '|' + lvl])).join('');
+      const rowsHeader = selLevels.length ? `<div class="price-rows-header"><span>Niveau</span><span>Tarif (€)</span><span></span></div>` : '';
+      return `<div class="price-block" data-format="${fmt}">
+        <div class="price-block-header"><span class="price-block-title">${fmt}</span><button type="button" class="btn-remove-price" onclick="uncheckFormat('${cb.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+        <span class="price-levels-label">Niveaux proposés pour ce format</span>
+        <div class="formats-grid plvl-grid">${levelChecks}</div>
+        <div class="price-rows-container" id="prows_${safeId(fmt)}">${rowsHeader}${priceRows}</div>
+      </div>`;
     }).join('');
   }
 
+  window.togglePriceLevel = function(fmt, lvl, cb, fmtCbId) {
+    const container = document.getElementById('prows_' + safeId(fmt));
+    if (!container) return;
+    if (cb.checked) {
+      // Add header if first row
+      if (!container.querySelector('.price-row')) container.insertAdjacentHTML('afterbegin', `<div class="price-rows-header"><span>Niveau</span><span>Tarif (€)</span><span></span></div>`);
+      container.insertAdjacentHTML('beforeend', makePriceRow(fmt, lvl, fmtCbId, ''));
+    } else {
+      container.querySelector(`.price-row[data-level="${lvl}"]`)?.remove();
+      if (!container.querySelector('.price-row')) container.querySelector('.price-rows-header')?.remove();
+    }
+  };
+
   window.uncheckFormat = function(cbId) { const cb = document.getElementById(cbId); if (cb) { cb.checked = false; cb.dispatchEvent(new Event('change')); } };
+  window.uncheckPriceLevel = function(cbId) { const cb = document.getElementById(cbId); if (cb) { cb.checked = false; cb.dispatchEvent(new Event('change')); } };
 
   window.handleCoverChange = function(input) {
     if (!input.files?.[0]) return;
@@ -1407,10 +1469,15 @@
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Enregistrement…';
     const imageUrl = await uploadCoverImage();
-    const formats = [...document.querySelectorAll('#formatsGrid input:checked')].map(cb => cb.value);
-    const prices = {};
-    document.querySelectorAll('#pricesTable .price-row').forEach(row => { const val = row.querySelector('input')?.value; if (val) prices[row.dataset.format] = parseFloat(val); });
-    const priceFrom = Object.values(prices).length ? Math.min(...Object.values(prices)) : null;
+    // Collecter les ticket_types depuis le formulaire
+    const ticketTypes = [];
+    document.querySelectorAll('#pricesTable .price-row[data-key]').forEach(row => {
+      const [format, level] = row.dataset.key.split('|');
+      const price = parseFloat(row.querySelector('input')?.value) || 0;
+      if (format && level) ticketTypes.push({ format, level, price });
+    });
+    const priceFrom = ticketTypes.length ? Math.min(...ticketTypes.map(t => t.price)) : null;
+
     const payload = {
       name: document.getElementById('f_name').value.trim(),
       race_type: document.getElementById('f_race_type').value,
@@ -1425,18 +1492,33 @@
       distance_km: parseFloat(document.getElementById('f_distance').value) || null,
       elevation_m: parseInt(document.getElementById('f_elevation').value) || null,
       max_participants: parseInt(document.getElementById('f_max_participants').value) || null,
-      formats, prices, price_from: priceFrom,
+      price_from: priceFrom,
       published: document.getElementById('f_published').checked,
       organizer_id: currentUser.id,
       organizer_name: currentProfile?.full_name || currentUser.email,
     };
     if (imageUrl) payload.image_url = imageUrl;
-    let error;
-    if (editingEventId) ({ error } = await sb.from('event').update(payload).eq('id', editingEventId));
-    else ({ error } = await sb.from('event').insert(payload));
+
+    let error, eventId = editingEventId;
+    if (editingEventId) {
+      ({ error } = await sb.from('event').update(payload).eq('id', editingEventId));
+    } else {
+      const { data: newEv, error: insErr } = await sb.from('event').insert(payload).select('id').single();
+      error = insErr;
+      if (newEv) eventId = newEv.id;
+    }
     btn.disabled = false;
     btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg><span id="submitBtnText">${editingEventId ? 'Mettre à jour' : "Enregistrer l'événement"}</span>`;
     if (error) { console.error(error); showToast('Erreur : ' + (error.message || 'inconnue'), 'error'); return; }
+
+    // Sauvegarder les ticket_types (delete + insert)
+    if (eventId) {
+      await sb.from('ticket_type').delete().eq('event_id', eventId);
+      if (ticketTypes.length) {
+        const { error: ttErr } = await sb.from('ticket_type').insert(ticketTypes.map(t => ({ ...t, event_id: eventId })));
+        if (ttErr) console.error('ticket_type:', ttErr);
+      }
+    }
     await loadEvents();
     document.getElementById('createFormWrapper').style.display = 'none';
     document.getElementById('successTitle').textContent = editingEventId ? 'Événement mis à jour !' : 'Événement créé !';
@@ -1483,10 +1565,22 @@
     if (ev.date) setVal('f_date', ev.date.slice(0,10));
     if (ev.date_end) setVal('f_date_end', ev.date_end.slice(0,10));
     document.getElementById('f_published').checked = !!ev.published;
-    if (Array.isArray(ev.formats)) {
-      document.querySelectorAll('#formatsGrid input').forEach(cb => { cb.checked = ev.formats.includes(cb.value); });
+    if (Array.isArray(ev.ticket_type) && ev.ticket_type.length) {
+      // Cocher les formats présents dans ticket_type
+      const formats = [...new Set(ev.ticket_type.map(t => t.format))];
+      document.querySelectorAll('#formatsGrid input').forEach(cb => { cb.checked = formats.includes(cb.value); });
       syncPricesTable();
-      if (ev.prices) Object.entries(ev.prices).forEach(([fmt, val]) => { const row = document.querySelector(`#pricesTable .price-row[data-format="${fmt}"] input`); if (row) row.value = val; });
+      // Pour chaque ticket, cocher le niveau et remplir le prix
+      ev.ticket_type.forEach(t => {
+        const key = t.format + '|' + t.level;
+        const cb = document.getElementById('plvl_' + safeId(key));
+        if (cb && !cb.checked) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+        // Attendre que le DOM soit mis à jour par syncPricesTable/togglePriceLevel
+        setTimeout(() => {
+          const row = document.querySelector(`#pricesTable .price-row[data-key="${key}"] input`);
+          if (row) row.value = t.price ?? '';
+        }, 50);
+      });
     }
     if (ev.image_url) {
       coverExistingUrl = ev.image_url;
@@ -1541,7 +1635,8 @@
       sb.from('profiles').update({ full_name: fullName, org_name: orgName, org_website: orgWebsite, phone }).eq('id', currentUser.id),
       sb.from('organizers').update({ org_name: orgName, website: orgWebsite, phone }).eq('user_id', currentUser.id),
     ]);
-    if (r1.error) { showToast('Erreur lors de la sauvegarde', 'error'); return; }
+    if (r1.error) { showToast('Erreur : ' + r1.error.message, 'error'); console.error('profiles error', r1.error); return; }
+    if (r2.error) { console.warn('organizers error', r2.error); }
     document.getElementById('sidebarName').textContent = orgName || fullName || currentUser.email;
     document.getElementById('sidebarAvatar').textContent = (fullName || currentUser.email).charAt(0).toUpperCase();
     showToast('Profil mis à jour !', 'success');

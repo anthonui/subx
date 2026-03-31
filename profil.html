@@ -718,6 +718,33 @@
     <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
   </div>
 
+  <!-- Email not confirmed screen -->
+  <div id="emailNotConfirmed" style="display:none;position:fixed;inset:0;background:var(--black);z-index:9998;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;">
+    <img src="logo_subx.svg" alt="SUBX" style="height:34px;margin-bottom:40px;opacity:0.85;">
+    <div style="width:76px;height:76px;background:rgba(124,185,40,0.1);border:1.5px solid rgba(124,185,40,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:24px;">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#7CB928" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    </div>
+    <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:12px;">Confirme ton adresse email</h2>
+    <p style="font-size:0.88rem;color:rgba(255,255,255,0.55);line-height:1.7;max-width:360px;margin-bottom:8px;">
+      Un email de confirmation a été envoyé à
+    </p>
+    <p id="unconfirmedEmail" style="font-size:0.92rem;font-weight:600;color:var(--green);margin-bottom:24px;"></p>
+    <p style="font-size:0.82rem;color:rgba(255,255,255,0.4);line-height:1.7;max-width:360px;margin-bottom:36px;">
+      Clique sur le lien dans l'email pour activer ton compte.<br>Pense à vérifier tes spams.
+    </p>
+    <button onclick="resendConfirmation()" id="btnResend" style="background:var(--green);color:#fff;border:none;padding:13px 32px;border-radius:50px;font-family:'Montserrat',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;margin-bottom:16px;">
+      Renvoyer l'email
+    </button>
+    <br>
+    <button onclick="sb.auth.signOut().then(()=>window.location.href='index.html')" style="background:none;border:none;color:rgba(255,255,255,0.35);font-family:'Montserrat',sans-serif;font-size:0.78rem;cursor:pointer;margin-top:8px;">
+      ← Retour à l'accueil
+    </button>
+    <p id="resendMsg" style="font-size:0.78rem;color:var(--green);margin-top:16px;min-height:20px;"></p>
+  </div>
+
   <!-- Sidebar overlay (mobile) -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
@@ -1022,8 +1049,16 @@
       const { data: { session } } = await sb.auth.getSession();
 
       if (!session) {
-        // Non connecté → retour accueil
         window.location.href = 'index.html';
+        return;
+      }
+
+      // Email non confirmé → écran dédié
+      if (!session.user.email_confirmed_at) {
+        guard.style.display = 'none';
+        const screen = document.getElementById('emailNotConfirmed');
+        screen.style.display = 'flex';
+        document.getElementById('unconfirmedEmail').textContent = session.user.email;
         return;
       }
 
@@ -1034,6 +1069,29 @@
       populateUI(currentUser);
       await loadProfile(currentUser);
     });
+
+    async function resendConfirmation() {
+      const btn = document.getElementById('btnResend');
+      const msg = document.getElementById('resendMsg');
+      btn.disabled = true;
+      btn.textContent = 'Envoi…';
+
+      const { data: { session } } = await sb.auth.getSession();
+      const email = session?.user?.email;
+
+      const { error } = await sb.auth.resend({ type: 'signup', email });
+
+      btn.disabled = false;
+      btn.textContent = 'Renvoyer l\'email';
+
+      if (error) {
+        msg.style.color = '#e74c3c';
+        msg.textContent = 'Erreur lors de l\'envoi. Réessaie dans quelques minutes.';
+      } else {
+        msg.style.color = 'var(--green)';
+        msg.textContent = '✓ Email renvoyé ! Vérifie ta boîte mail.';
+      }
+    }
 
     function populateUI(user) {
       const meta = user.user_metadata || {};

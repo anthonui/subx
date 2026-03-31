@@ -1900,9 +1900,42 @@
         btn.disabled = false;
         btn.textContent = 'Créer mon compte';
       } else {
-        setAuthMessage('Compte créé ! Vérifie ta boîte mail pour confirmer.', 'success');
-        btn.textContent = 'Créer mon compte';
+        showEmailConfirmationScreen(email);
       }
+    }
+
+    function showEmailConfirmationScreen(email) {
+      const modal = document.querySelector('.auth-modal');
+      modal.innerHTML = `
+        <div id="emailConfirmScreen" style="text-align:center;padding:12px 8px 4px;">
+          <div style="width:68px;height:68px;background:#f0fff4;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <h2 style="font-size:1.15rem;font-weight:700;color:#1A1A1A;margin-bottom:10px;">Vérifie ta boîte mail</h2>
+          <p style="font-size:0.85rem;color:#666;line-height:1.65;margin-bottom:6px;">
+            Un email de confirmation a été envoyé à
+          </p>
+          <p style="font-size:0.88rem;font-weight:600;color:#1A1A1A;margin-bottom:16px;">${email}</p>
+          <p style="font-size:0.82rem;color:#999;line-height:1.6;margin-bottom:28px;">
+            Clique sur le lien dans l'email pour activer ton compte et accéder à ton dashboard.
+          </p>
+          <div style="height:3px;background:#f0f0f0;border-radius:4px;overflow:hidden;margin-bottom:16px;">
+            <div id="confirmProgress" style="height:100%;width:100%;background:#7CB928;border-radius:4px;transition:width 5s linear;"></div>
+          </div>
+          <p style="font-size:0.72rem;color:#bbb;">Cette fenêtre se ferme automatiquement…</p>
+        </div>`;
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const bar = document.getElementById('confirmProgress');
+          if (bar) bar.style.width = '0%';
+        });
+      });
+
+      setTimeout(() => closeAuthModal(), 5000);
     }
 
     async function handleGoogleAuth() {

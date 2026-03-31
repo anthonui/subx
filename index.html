@@ -1486,9 +1486,12 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwdXJ5b21yZXFscmhodXRqbmtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjUxODEsImV4cCI6MjA5MDQ0MTE4MX0.yKO82AzFVYwI8TD2UhtqmrneGAHA32IA2gNDoZo7V8A'
     );
 
+    // Capturer avant que Supabase nettoie l'URL
+    const isOAuthCallback = window.location.search.includes('code=') || window.location.hash.includes('access_token');
+
     // Callback OAuth Google — doit être avant DOMContentLoaded
     sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session && (window.location.search.includes('code=') || window.location.hash.includes('access_token'))) {
+      if (event === 'SIGNED_IN' && session && isOAuthCallback) {
         const isNewUser = (new Date() - new Date(session.user.created_at)) < 120000;
         if (isNewUser) {
           // Nouvel utilisateur Google → sélection du rôle

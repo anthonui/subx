@@ -1492,14 +1492,13 @@
     // Callback OAuth Google — doit être avant DOMContentLoaded
     sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session && isOAuthCallback) {
-        const isNewUser = (new Date() - new Date(session.user.created_at)) < 120000;
-        if (isNewUser) {
-          // Nouvel utilisateur Google → sélection du rôle
+        const { data: profile } = await sb.from('profiles').select('role, role_confirmed').eq('id', session.user.id).single();
+        if (!profile?.role_confirmed) {
+          // Rôle jamais confirmé → sélection du rôle
           document.getElementById('googleRoleOverlay').style.display = 'flex';
           document.getElementById('googleRoleOverlay').dataset.uid = session.user.id;
         } else {
-          const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-          window.location.replace(profile?.role === 'organizer' ? 'organisateur.html' : 'profil.html');
+          window.location.replace(profile.role === 'organizer' ? 'organisateur.html' : 'profil.html');
         }
       }
     });
@@ -1507,10 +1506,9 @@
     window.selectGoogleRole = async function(role) {
       const overlay = document.getElementById('googleRoleOverlay');
       const uid = overlay.dataset.uid;
-      const btn = overlay.querySelector(`[data-role="${role}"]`);
-      btn.disabled = true;
-      btn.textContent = '…';
-      await sb.from('profiles').update({ role, is_organizer: role === 'organizer' }).eq('id', uid);
+      const btns = overlay.querySelectorAll('button');
+      btns.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
+      await sb.from('profiles').update({ role, is_organizer: role === 'organizer', role_confirmed: true }).eq('id', uid);
       window.location.replace(role === 'organizer' ? 'organisateur.html' : 'profil.html');
     };
 
@@ -1997,13 +1995,13 @@
         btn.disabled = false; btn.textContent = 'Créer mon compte'; return;
       }
 
-      // Sauvegarder account_type dans profiles (géré par le trigger, mais on le force)
-      if (selectedAccountType === 'organization') {
-        // Rediriger vers l'espace organisateur après confirmation
-        showEmailConfirmationScreen(email, true);
-      } else {
-        showEmailConfirmationScreen(email, false);
+      // Sauvegarder le rôle choisi (le trigger crée le profil, on met à jour le rôle)
+      const { data: { user } } = await sb.auth.getUser();
+      if (user) {
+        const isOrg = selectedAccountType === 'organization';
+        await sb.from('profiles').update({ role: isOrg ? 'organizer' : 'athlete', is_organizer: isOrg, role_confirmed: true }).eq('id', user.id);
       }
+      showEmailConfirmationScreen(email, selectedAccountType === 'organization');
       btn.disabled = false; btn.textContent = 'Créer mon compte';
     }
 

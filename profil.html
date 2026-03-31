@@ -1101,7 +1101,17 @@
       const guard = document.getElementById('authGuard');
       guard.style.display = 'flex';
 
-      const { data: { session } } = await sb.auth.getSession();
+      let { data: { session } } = await sb.auth.getSession();
+
+      // Callback OAuth (Google) : le code est dans l'URL, on attend l'échange
+      if (!session && (window.location.hash.includes('access_token') || window.location.search.includes('code='))) {
+        session = await new Promise(resolve => {
+          const timer = setTimeout(() => resolve(null), 6000);
+          const { data: { subscription } } = sb.auth.onAuthStateChange((event, s) => {
+            if (s) { clearTimeout(timer); subscription.unsubscribe(); resolve(s); }
+          });
+        });
+      }
 
       if (!session) {
         window.location.href = 'index.html';

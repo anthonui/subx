@@ -317,7 +317,7 @@
     .onboarding-header p { font-size: 0.82rem; color: rgba(255,255,255,0.4); line-height: 1.7; }
     .onboarding-header .welcome-name { color: var(--green); }
 
-    .onboarding-steps { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
+    .onboarding-steps { display: grid; grid-template-columns: auto 64px auto 64px auto; align-items: start; justify-content: center; gap: 0; margin-bottom: 32px; }
     .ob-step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .ob-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); background: var(--dark); color: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; transition: all 0.3s; }
     .ob-circle.active { border-color: var(--green); color: var(--green); background: rgba(124,185,40,0.1); }
@@ -325,7 +325,7 @@
     .ob-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.25); white-space: nowrap; }
     .ob-label.active { color: var(--green); }
     .ob-label.done { color: rgba(255,255,255,0.4); }
-    .ob-connector { width: 60px; height: 2px; background: rgba(255,255,255,0.08); margin-bottom: 20px; flex-shrink: 0; transition: background 0.3s; }
+    .ob-connector { width: 100%; height: 2px; background: rgba(255,255,255,0.08); margin-top: 15px; transition: background 0.3s; }
     .ob-connector.done { background: var(--green); }
 
     .ob-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 16px; }

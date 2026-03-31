@@ -1486,6 +1486,14 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwdXJ5b21yZXFscmhodXRqbmtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjUxODEsImV4cCI6MjA5MDQ0MTE4MX0.yKO82AzFVYwI8TD2UhtqmrneGAHA32IA2gNDoZo7V8A'
     );
 
+    // Callback OAuth Google — doit être avant DOMContentLoaded
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session && (window.location.search.includes('code=') || window.location.hash.includes('access_token'))) {
+        const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+        window.location.replace((profile?.role === 'organizer') ? 'organisateur.html' : 'profil.html');
+      }
+    });
+
     function formatDate(iso) {
       const d = new Date(iso + 'T12:00:00');
       const str = d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });

@@ -771,6 +771,12 @@
           Résultats
         </button>
 
+        <span class="nav-label" id="orgNavLabel" style="display:none;">Organisateur</span>
+        <a class="nav-link" id="orgNavLink" href="organisateur.html" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          Espace organisateur
+        </a>
+
         <span class="nav-label">Compte</span>
         <button class="nav-link" data-page="profile" onclick="showPage('profile', this)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1127,12 +1133,14 @@
           document.getElementById('fieldLastName').value = parts.slice(1).join(' ') || '';
         }
         if (data.city) document.getElementById('fieldCity').value = data.city;
-        if (data.role) {
-          document.getElementById('fieldRole').value = data.role;
-          updateRoleBadge(data.role);
-        }
+        if (data.role) document.getElementById('fieldRole').value = data.role;
         if (data.preferred_discipline) document.getElementById('fieldDiscipline').value = data.preferred_discipline;
         if (data.avatar_url) setAvatarImage(data.avatar_url + '?t=' + Date.now());
+        updateRoleBadge(data.role, data.is_organizer);
+        if (data.is_organizer) {
+          document.getElementById('orgNavLabel').style.display = '';
+          document.getElementById('orgNavLink').style.display = '';
+        }
       }
     }
 
@@ -1329,10 +1337,13 @@
     }
 
     // ===== ROLE BADGE =====
-    function updateRoleBadge(role) {
-      document.getElementById('topbarRole').textContent = role === 'organizer' ? 'Organisateur SUBX' : 'Athlète SUBX';
+    function updateRoleBadge(role, isOrganizer) {
+      let label = 'Athlète SUBX';
+      if (isOrganizer && role === 'athlete') label = 'Athlète & Organisateur SUBX';
+      else if (isOrganizer || role === 'organizer') label = 'Organisateur SUBX';
+      document.getElementById('topbarRole').textContent = label;
       const hint = document.getElementById('roleHint');
-      if (hint) hint.style.display = role === 'organizer' ? 'none' : '';
+      if (hint) hint.style.display = isOrganizer ? 'none' : '';
     }
 
     // ===== LOGOUT =====

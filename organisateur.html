@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Organisateur — SUBX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #7CB928; --green-dark: #5A8A1E; --green-light: #9BD43E;
+      --black: #1A1A1A; --dark: #2A2A2A; --card: #222222;
+      --border: rgba(255,255,255,0.07); --white: #FFFFFF; --sidebar-w: 240px;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--black); color: var(--white); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    #authGuard { display: flex; position: fixed; inset: 0; background: var(--black); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+    .layout { display: flex; min-height: 100vh; opacity: 0; transition: opacity 0.3s ease; }
+    .layout.ready { opacity: 1; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar-w); background: var(--dark); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar-logo { padding: 28px 24px 24px; border-bottom: 1px solid var(--border); }
+    .sidebar-logo img { height: 28px; width: auto; }
+    .organizer-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,185,40,0.15); border: 1px solid rgba(124,185,40,0.3); color: var(--green); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 20px; margin-top: 8px; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+    .nav-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); padding: 16px 12px 8px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; font-size: 0.82rem; font-weight: 500; color: rgba(255,255,255,0.55); cursor: pointer; transition: 0.2s; }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--white); }
+    .nav-item.active { background: rgba(124,185,40,0.15); color: var(--green); }
+    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; background: var(--green); color: #fff; font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+    .sidebar-footer { padding: 16px 12px 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+    .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,0.04); }
+    .sidebar-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: #fff; overflow: hidden; flex-shrink: 0; }
+    .sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .sidebar-user-name { font-size: 0.78rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-user-role { font-size: 0.62rem; color: var(--green); font-weight: 500; }
+    .btn-logout { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.4); cursor: pointer; transition: 0.2s; background: none; border: none; width: 100%; font-family: 'Montserrat', sans-serif; }
+    .btn-logout:hover { background: rgba(229,57,53,0.1); color: #E57373; }
+    .btn-logout svg { width: 16px; height: 16px; }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { position: sticky; top: 0; z-index: 50; background: rgba(26,26,26,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; gap: 16px; }
+    .topbar-title { font-family: 'Oswald', sans-serif; font-size: 1.3rem; font-weight: 600; letter-spacing: 0.04em; }
+    .topbar-actions { margin-left: auto; display: flex; gap: 12px; align-items: center; }
+    .page { display: none; padding: 32px; }
+    .page.active { display: block; }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; position: relative; overflow: hidden; }
+    .stat-card::before { display: none; }
+    .stat-value { font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 600; line-height: 1; margin-bottom: 6px; }
+    .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.45); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-icon { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; background: rgba(124,185,40,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--green); }
+    .stat-icon svg { width: 18px; height: 18px; }
+
+    /* SECTION */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-title { font-family: 'Oswald', sans-serif; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; }
+    .section-sub { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 50px; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; text-transform: uppercase; letter-spacing: 0.05em; }
+    .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+    .btn-outline:hover { border-color: var(--green); color: var(--green); }
+    .btn-danger { background: rgba(229,57,53,0.15); color: #E57373; border: 1px solid rgba(229,57,53,0.2); }
+    .btn-danger:hover { background: rgba(229,57,53,0.25); }
+    .btn-sm { padding: 7px 14px; font-size: 0.72rem; }
+
+    /* EVENT CARDS */
+    .events-list { display: flex; flex-direction: column; gap: 12px; }
+    .event-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; align-items: stretch; transition: border-color 0.2s; }
+    .event-card:hover { border-color: rgba(124,185,40,0.3); }
+    .event-card-cover { width: 120px; min-height: 90px; flex-shrink: 0; object-fit: cover; }
+    .event-card-cover-placeholder { width: 120px; min-height: 90px; flex-shrink: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.2); }
+    .event-card-cover-placeholder svg { width: 32px; height: 32px; }
+    .event-card-body { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; }
+    .event-card-name { font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 6px; }
+    .event-card-meta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
+    .event-card-meta span { display: flex; align-items: center; gap: 4px; }
+    .event-card-meta svg { width: 12px; height: 12px; }
+    .event-card-actions { padding: 16px; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 10px; }
+    .status-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 20px; }
+    .status-published { background: rgba(124,185,40,0.15); color: var(--green); border: 1px solid rgba(124,185,40,0.3); }
+    .status-draft { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); }
+    .status-cancelled { background: rgba(229,57,53,0.1); color: #E57373; border: 1px solid rgba(229,57,53,0.2); }
+    .chip { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; background: rgba(124,185,40,0.1); color: var(--green); border: 1px solid rgba(124,185,40,0.25); }
+
+    /* FORM */
+    .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px 32px; margin-bottom: 20px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-label { font-size: 0.73rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.55); }
+    .form-label span { color: var(--green); margin-left: 2px; }
+    .form-input, .form-select, .form-textarea { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; outline: none; transition: border-color 0.2s; width: 100%; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--green); background: rgba(124,185,40,0.04); }
+    .form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.2); }
+    .form-select option { background: var(--dark); }
+    .form-textarea { resize: vertical; min-height: 100px; }
+    .form-hint { font-size: 0.68rem; color: rgba(255,255,255,0.25); margin-top: 2px; }
+
+    /* STEPS */
+    .step-indicator { display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
+    .step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; transition: all 0.3s; border: 2px solid rgba(255,255,255,0.1); background: var(--dark); color: rgba(255,255,255,0.3); position: relative; z-index: 1; }
+    .step-circle.done { background: var(--green); border-color: var(--green); color: #fff; }
+    .step-circle.active { border-color: var(--green); color: var(--green); background: rgba(124,185,40,0.1); }
+    .step-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.25); white-space: nowrap; }
+    .step-label.active { color: var(--green); }
+    .step-label.done { color: rgba(255,255,255,0.5); }
+    .step-connector { width: 80px; height: 2px; background: rgba(255,255,255,0.1); margin-bottom: 24px; transition: background 0.3s; flex-shrink: 0; }
+    .step-connector.done { background: var(--green); }
+
+    /* FORMAT CHECKBOXES */
+    .formats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .format-check { position: relative; }
+    .format-check input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .format-check label { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; background: rgba(255,255,255,0.03); cursor: pointer; font-size: 0.8rem; font-weight: 500; color: rgba(255,255,255,0.5); transition: all 0.2s; user-select: none; }
+    .format-check input:checked + label { border-color: var(--green); background: rgba(124,185,40,0.1); color: var(--green); }
+    .format-check label::before { content: ''; width: 16px; height: 16px; border-radius: 4px; border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0; transition: all 0.2s; }
+    .format-check input:checked + label::before { background: var(--green); border-color: var(--green); background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; background-size: 10px; }
+
+    /* PRICES */
+    .prices-table { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .price-row { display: grid; grid-template-columns: 1fr 1fr 36px; gap: 10px; align-items: center; animation: slideIn 0.25s ease; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .price-row-label { font-size: 0.78rem; color: rgba(255,255,255,0.6); font-weight: 500; }
+    .btn-remove-price { width: 32px; height: 32px; border-radius: 8px; background: rgba(229,57,53,0.1); border: 1px solid rgba(229,57,53,0.2); color: #E57373; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+    .btn-remove-price:hover { background: rgba(229,57,53,0.25); }
+    .btn-remove-price svg { width: 14px; height: 14px; pointer-events: none; }
+
+    /* COVER UPLOAD */
+    .cover-upload-zone { border: 2px dashed rgba(255,255,255,0.1); border-radius: 14px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+    .cover-upload-zone:hover { border-color: var(--green); background: rgba(124,185,40,0.03); }
+    .cover-upload-zone.has-image { border-style: solid; border-color: rgba(124,185,40,0.4); }
+    .cover-preview { width: 100%; max-height: 240px; object-fit: cover; border-radius: 10px; margin: 0 auto 16px; display: none; }
+    .cover-upload-icon { color: rgba(255,255,255,0.2); margin-bottom: 12px; }
+    .cover-upload-icon svg { width: 40px; height: 40px; }
+    .cover-upload-text { font-size: 0.82rem; color: rgba(255,255,255,0.4); }
+    .cover-upload-text strong { color: var(--green); display: block; font-size: 0.9rem; margin-bottom: 4px; }
+
+    /* TOGGLE */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info strong { font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 2px; }
+    .toggle-info span { font-size: 0.72rem; color: rgba(255,255,255,0.35); }
+    .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 24px; cursor: pointer; transition: 0.3s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
+    .toggle-switch input:checked + .toggle-slider { background: var(--green); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* SUCCESS */
+    #successScreen { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px 40px; gap: 20px; }
+    #successScreen.active { display: flex; }
+    .success-icon { width: 80px; height: 80px; border-radius: 50%; background: rgba(124,185,40,0.15); border: 2px solid rgba(124,185,40,0.3); display: flex; align-items: center; justify-content: center; color: var(--green); }
+    .success-icon svg { width: 36px; height: 36px; }
+    #successScreen h2 { font-family: 'Oswald', sans-serif; font-size: 1.6rem; font-weight: 600; letter-spacing: 0.04em; }
+    #successScreen p { font-size: 0.85rem; color: rgba(255,255,255,0.5); max-width: 360px; }
+
+    /* DELETE MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9000; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal-box { background: var(--dark); border: 1px solid var(--border); border-radius: 18px; padding: 32px; max-width: 440px; width: 90%; text-align: center; }
+    .modal-box h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+    .modal-box p { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-bottom: 24px; line-height: 1.7; }
+    .modal-actions { display: flex; gap: 12px; justify-content: center; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-icon { color: rgba(255,255,255,0.1); margin: 0 auto 20px; }
+    .empty-icon svg { width: 56px; height: 56px; }
+    .empty-state h3 { font-size: 1rem; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+    .empty-state p { font-size: 0.78rem; color: rgba(255,255,255,0.25); margin-bottom: 24px; }
+
+    /* PROFILE */
+    .avatar-section { display: flex; align-items: center; gap: 24px; margin-bottom: 24px; padding: 24px; background: rgba(255,255,255,0.02); border-radius: 14px; border: 1px solid var(--border); }
+    .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.6rem; color: #fff; overflow: hidden; flex-shrink: 0; border: 3px solid rgba(124,185,40,0.3); }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* MISC */
+    .spinner { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--dark); border: 1px solid var(--border); border-radius: 50px; padding: 12px 22px; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; gap: 10px; z-index: 9999; opacity: 0; transition: all 0.3s; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: rgba(124,185,40,0.4); color: var(--green); }
+    .toast.error { border-color: rgba(229,57,53,0.4); color: #E57373; }
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+    /* ========== AUTH MODAL ========== */
+    .auth-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 9990;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .auth-overlay.active { display: flex; }
+    .auth-box {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .auth-logo { text-align: center; margin-bottom: 6px; }
+    .auth-logo img { height: 26px; margin: 0 auto; }
+    .auth-tagline { text-align: center; font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-bottom: 28px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .auth-tabs { display: flex; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 4px; margin-bottom: 28px; }
+    .auth-tab { flex: 1; text-align: center; padding: 9px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: 0.2s; color: rgba(255,255,255,0.4); }
+    .auth-tab.active { background: var(--green); color: #fff; }
+    .auth-form { display: flex; flex-direction: column; gap: 14px; }
+    .auth-input {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--white);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .auth-input:focus { border-color: var(--green); }
+    .auth-input::placeholder { color: rgba(255,255,255,0.2); }
+    .auth-btn {
+      background: var(--green); color: #fff; border: none;
+      padding: 13px; border-radius: 50px;
+      font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .auth-btn:hover { background: var(--green-dark); }
+    .auth-msg { text-align: center; font-size: 0.78rem; padding: 10px; border-radius: 8px; }
+    .auth-msg.error { background: rgba(229,57,53,0.1); color: #E57373; }
+    .auth-msg.success { background: rgba(124,185,40,0.1); color: var(--green); }
+    .auth-footer-link { text-align: center; font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 6px; }
+    .auth-footer-link a { color: var(--green); cursor: pointer; }
+    .auth-confirm-screen { text-align: center; padding: 20px 0; }
+    .auth-confirm-screen svg { margin: 0 auto 16px; color: var(--green); }
+    .auth-confirm-screen h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .auth-confirm-screen p { font-size: 0.8rem; color: rgba(255,255,255,0.45); line-height: 1.7; }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .formats-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid.cols-3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; }
+      .page { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="authGuard"><div class="spinner"></div></div>
+
+<!-- Auth Modal Organisateur -->
+<div class="auth-overlay" id="authModal">
+  <div class="auth-box">
+    <div class="auth-logo"><img src="logo_subx.svg" alt="SUBX"></div>
+    <div class="auth-tagline">Espace Organisateur</div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs" id="authTabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Connexion</div>
+      <div class="auth-tab" onclick="switchAuthTab('signup')">Créer un compte</div>
+    </div>
+
+    <!-- Login form -->
+    <form class="auth-form" id="formLogin" onsubmit="handleOrgLogin(event)">
+      <input type="email" class="auth-input" id="org_login_email" placeholder="Email" required autocomplete="email">
+      <input type="password" class="auth-input" id="org_login_pwd" placeholder="Mot de passe" required>
+      <div class="auth-msg" id="loginMsg" style="display:none;"></div>
+      <button type="submit" class="auth-btn" id="loginBtn">Se connecter</button>
+      <div class="auth-footer-link"><a onclick="switchAuthTab('signup')">Pas encore de compte ? Créer un espace organisateur</a></div>
+    </form>
+
+    <!-- Signup form -->
+    <form class="auth-form" id="formSignup" style="display:none;" onsubmit="handleOrgSignup(event)">
+      <input type="text" class="auth-input" id="org_signup_name" placeholder="Prénom et nom" required>
+      <input type="email" class="auth-input" id="org_signup_email" placeholder="Email" required autocomplete="email">
+      <input type="password" class="auth-input" id="org_signup_pwd" placeholder="Mot de passe (8 car. min.)" required minlength="8">
+      <div class="auth-msg" id="signupMsg" style="display:none;"></div>
+      <button type="submit" class="auth-btn" id="signupBtn">Créer mon espace organisateur</button>
+      <div class="auth-footer-link"><a onclick="switchAuthTab('login')">Déjà un compte ? Se connecter</a></div>
+    </form>
+
+    <!-- Confirm email screen -->
+    <div class="auth-confirm-screen" id="confirmScreen" style="display:none;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      <h3>Confirmez votre email</h3>
+      <p>Un lien de confirmation a été envoyé à<br><strong id="confirmEmailAddr" style="color:var(--green);"></strong><br><br>Cliquez sur le lien dans l'email pour activer votre espace organisateur.</p>
+    </div>
+  </div>
+</div>
+
+<div id="emailNotConfirmed" style="display:none;position:fixed;inset:0;background:var(--black);z-index:9998;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:40px;">
+  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#7CB928" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+  <h2 style="font-family:'Oswald',sans-serif;font-size:1.5rem;">Confirmez votre email</h2>
+  <p style="font-size:0.85rem;color:rgba(255,255,255,0.5);max-width:360px;line-height:1.7;">Confirmez votre adresse pour accéder à l'espace organisateur.<br><strong id="unconfirmedEmail" style="color:#7CB928;"></strong></p>
+  <button onclick="resendConfirmation()" style="background:var(--green);color:#fff;border:none;padding:12px 28px;border-radius:50px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;">Renvoyer l'email</button>
+  <a href="index.html" style="font-size:0.8rem;color:rgba(255,255,255,0.35);">← Retour à l'accueil</a>
+</div>
+
+<div class="layout" id="mainLayout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="logo_subx.svg" alt="SUBX">
+      <div class="organizer-badge">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Organisateur
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Principal</div>
+      <div class="nav-item active" data-page="overview" onclick="showPage('overview')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Vue d'ensemble
+      </div>
+      <div class="nav-item" data-page="events" onclick="showPage('events')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Mes événements
+        <span class="nav-badge" id="navEventCount">0</span>
+      </div>
+      <div class="nav-item" data-page="create" onclick="openCreateForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Créer un événement
+      </div>
+      <div class="nav-label">Compte</div>
+      <div class="nav-item" data-page="profil" onclick="showPage('profil')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Mon profil
+      </div>
+      <div class="nav-item" data-page="settings" onclick="showPage('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Paramètres
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">?</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarName">Chargement…</div>
+          <div class="sidebar-user-role">Organisateur</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div><div class="topbar-title" id="topbarTitle">Vue d'ensemble</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="openCreateForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nouvel événement
+        </button>
+      </div>
+    </div>
+
+    <!-- PAGE: Vue d'ensemble -->
+    <div class="page active" id="page-overview">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="statPublished">0</div>
+          <div class="stat-label">Événements publiés</div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-label">Total événements</div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statNext">—</div>
+          <div class="stat-label">Prochain événement</div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statDrafts">0</div>
+          <div class="stat-label">Brouillons</div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        </div>
+      </div>
+      <div class="section-header">
+        <div><div class="section-title">Événements récents</div><div class="section-sub">Vos 3 derniers événements créés</div></div>
+        <button class="btn btn-outline btn-sm" onclick="showPage('events')">Voir tout</button>
+      </div>
+      <div class="events-list" id="recentEventsList">
+        <div class="empty-state">
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <h3>Aucun événement</h3>
+          <p>Créez votre premier événement pour le voir apparaître ici.</p>
+          <button class="btn btn-primary btn-sm" onclick="openCreateForm()">Créer un événement</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Mes événements -->
+    <div class="page" id="page-events">
+      <div class="section-header">
+        <div><div class="section-title">Mes événements</div><div class="section-sub" id="eventsSubtitle">Chargement…</div></div>
+        <button class="btn btn-primary btn-sm" onclick="openCreateForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Créer
+        </button>
+      </div>
+      <div class="events-list" id="allEventsList">
+        <div style="text-align:center;padding:40px;"><div class="spinner" style="margin:auto;"></div></div>
+      </div>
+    </div>
+
+    <!-- PAGE: Créer / Modifier -->
+    <div class="page" id="page-create">
+      <div id="successScreen">
+        <div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <h2 id="successTitle">Événement créé !</h2>
+        <p id="successDesc">Votre événement a été enregistré avec succès.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
+          <button class="btn btn-outline" onclick="showPage('events')">Voir mes événements</button>
+          <button class="btn btn-primary" onclick="openCreateForm()">Créer un autre</button>
+        </div>
+      </div>
+
+      <div id="createFormWrapper">
+        <div class="section-header">
+          <div><div class="section-title" id="formPageTitle">Créer un événement</div><div class="section-sub">Remplissez les informations étape par étape</div></div>
+          <button class="btn btn-outline btn-sm" onclick="showPage('events')">Annuler</button>
+        </div>
+
+        <div class="step-indicator">
+          <div class="step-item"><div class="step-circle active" id="step-circle-1">1</div><div class="step-label active" id="step-label-1">Général</div></div>
+          <div class="step-connector" id="conn-1"></div>
+          <div class="step-item"><div class="step-circle" id="step-circle-2">2</div><div class="step-label" id="step-label-2">Lieu & Date</div></div>
+          <div class="step-connector" id="conn-2"></div>
+          <div class="step-item"><div class="step-circle" id="step-circle-3">3</div><div class="step-label" id="step-label-3">Formats & Prix</div></div>
+          <div class="step-connector" id="conn-3"></div>
+          <div class="step-item"><div class="step-circle" id="step-circle-4">4</div><div class="step-label" id="step-label-4">Médias</div></div>
+        </div>
+
+        <!-- Step 1 -->
+        <div id="formStep1">
+          <div class="form-card">
+            <div class="form-grid">
+              <div class="form-group form-full">
+                <label class="form-label">Nom de l'événement <span>*</span></label>
+                <input type="text" class="form-input" id="f_name" placeholder="Ex : Trail des Alpes 2026">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Type de course <span>*</span></label>
+                <select class="form-select" id="f_race_type">
+                  <option value="">Sélectionner…</option>
+                  <option value="trail">Trail</option>
+                  <option value="route">Route</option>
+                  <option value="ocr">OCR</option>
+                  <option value="vtt">VTT / MTB</option>
+                  <option value="triathlon">Triathlon</option>
+                  <option value="ski">Ski / Rando</option>
+                  <option value="cyclisme">Cyclisme</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Niveau</label>
+                <select class="form-select" id="f_level">
+                  <option value="">Tous niveaux</option>
+                  <option value="debutant">Débutant</option>
+                  <option value="intermediaire">Intermédiaire</option>
+                  <option value="expert">Expert</option>
+                  <option value="elite">Élite</option>
+                </select>
+              </div>
+              <div class="form-group form-full">
+                <label class="form-label">Description</label>
+                <textarea class="form-textarea" id="f_description" placeholder="Décrivez votre événement, le parcours, l'ambiance…" style="min-height:130px;"></textarea>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn btn-primary" onclick="goStep(2)">Suivant →</button>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="formStep2" style="display:none;">
+          <div class="form-card">
+            <div class="form-grid cols-3">
+              <div class="form-group">
+                <label class="form-label">Date de début <span>*</span></label>
+                <input type="date" class="form-input" id="f_date">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date de fin</label>
+                <input type="date" class="form-input" id="f_date_end">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ville <span>*</span></label>
+                <input type="text" class="form-input" id="f_city" placeholder="Ex : Chamonix">
+              </div>
+              <div class="form-group form-full">
+                <label class="form-label">Adresse complète</label>
+                <input type="text" class="form-input" id="f_address" placeholder="Ex : 1 Rue du Mont-Blanc, 74400 Chamonix">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Lieu / Salle / Départ</label>
+                <input type="text" class="form-input" id="f_venue" placeholder="Ex : Stade des Cimes">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Site web</label>
+                <input type="url" class="form-input" id="f_website" placeholder="https://…">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Distance (km)</label>
+                <input type="number" class="form-input" id="f_distance" placeholder="Ex : 42" min="0" step="0.1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Dénivelé + (m)</label>
+                <input type="number" class="form-input" id="f_elevation" placeholder="Ex : 2500" min="0">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Participants max</label>
+                <input type="number" class="form-input" id="f_max_participants" placeholder="Ex : 500" min="1">
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <button class="btn btn-outline" onclick="goStep(1)">← Précédent</button>
+            <button class="btn btn-primary" onclick="goStep(3)">Suivant →</button>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="formStep3" style="display:none;">
+          <div class="form-card">
+            <div class="form-group">
+              <label class="form-label">Formats disponibles <span>*</span></label>
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-bottom:14px;">Sélectionnez tous les formats proposés pour cet événement</div>
+              <div class="formats-grid" id="formatsGrid">
+                <div class="format-check"><input type="checkbox" id="fmt_solo_h" value="Solo Homme"><label for="fmt_solo_h">Solo Homme</label></div>
+                <div class="format-check"><input type="checkbox" id="fmt_solo_f" value="Solo Femme"><label for="fmt_solo_f">Solo Femme</label></div>
+                <div class="format-check"><input type="checkbox" id="fmt_solo_o" value="Solo Open"><label for="fmt_solo_o">Solo Open</label></div>
+                <div class="format-check"><input type="checkbox" id="fmt_duo_h" value="Team Double Hommes"><label for="fmt_duo_h">Team Double Hommes</label></div>
+                <div class="format-check"><input type="checkbox" id="fmt_duo_f" value="Team Double Femmes"><label for="fmt_duo_f">Team Double Femmes</label></div>
+                <div class="format-check"><input type="checkbox" id="fmt_duo_mx" value="Team Double Mixte"><label for="fmt_duo_mx">Team Double Mixte</label></div>
+                <div class="format-check"><input type="checkbox" id="fmt_team3" value="Team de 3"><label for="fmt_team3">Team de 3</label></div>
+                <div class="format-check"><input type="checkbox" id="fmt_team4" value="Team de 4"><label for="fmt_team4">Team de 4</label></div>
+                <div class="format-check"><input type="checkbox" id="fmt_relais" value="Relais"><label for="fmt_relais">Relais</label></div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div>
+              <label class="form-label">Tarifs par format</label>
+              <div class="form-hint" style="margin-bottom:12px;">Les lignes de tarifs s'affichent selon les formats sélectionnés ci-dessus</div>
+              <div id="pricesTable" class="prices-table">
+                <div style="font-size:0.78rem;color:rgba(255,255,255,0.25);padding:12px 0;">Sélectionnez des formats pour définir les tarifs</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <button class="btn btn-outline" onclick="goStep(2)">← Précédent</button>
+            <button class="btn btn-primary" onclick="goStep(4)">Suivant →</button>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div id="formStep4" style="display:none;">
+          <div class="form-card">
+            <div class="form-group">
+              <label class="form-label">Photo de couverture</label>
+              <div class="cover-upload-zone" id="coverZone" onclick="document.getElementById('f_cover_input').click()">
+                <input type="file" id="f_cover_input" accept="image/*" style="display:none" onchange="handleCoverChange(this)">
+                <img id="coverPreview" class="cover-preview" src="" alt="Aperçu">
+                <div class="cover-upload-icon" id="coverIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                <div class="cover-upload-text" id="coverText"><strong>Cliquez pour ajouter une photo</strong>JPG, PNG, WEBP — 5 Mo max. Recommandé : 1200×600 px</div>
+              </div>
+              <div id="coverFileName" style="font-size:0.72rem;color:var(--green);margin-top:8px;display:none;"></div>
+            </div>
+            <div class="divider"></div>
+            <div>
+              <label class="form-label" style="margin-bottom:16px;display:block;">Publication</label>
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <strong>Publier l'événement</strong>
+                  <span>L'événement sera visible sur SUBX par tous les athlètes</span>
+                </div>
+                <label class="toggle-switch"><input type="checkbox" id="f_published"><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <button class="btn btn-outline" onclick="goStep(3)">← Précédent</button>
+            <button class="btn btn-primary" id="submitBtn" onclick="submitEvent()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span id="submitBtnText">Enregistrer l'événement</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Mon profil -->
+    <div class="page" id="page-profil">
+      <div class="section-header">
+        <div><div class="section-title">Mon profil organisateur</div><div class="section-sub">Informations de votre organisation</div></div>
+      </div>
+      <div class="form-card">
+        <div class="avatar-section">
+          <div class="profile-avatar" id="profileAvatar">?</div>
+          <div>
+            <label for="avatarInput" class="btn btn-outline btn-sm" style="cursor:pointer;margin-bottom:8px;display:inline-flex;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Changer la photo
+            </label>
+            <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.25);">JPG, PNG — 2 Mo max</div>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Prénom <span>*</span></label><input type="text" class="form-input" id="p_first_name" placeholder="Prénom"></div>
+          <div class="form-group"><label class="form-label">Nom <span>*</span></label><input type="text" class="form-input" id="p_last_name" placeholder="Nom"></div>
+          <div class="form-group"><label class="form-label">Nom de l'organisation</label><input type="text" class="form-input" id="p_org_name" placeholder="Ex : SUBX Events"></div>
+          <div class="form-group"><label class="form-label">Site web de l'organisation</label><input type="url" class="form-input" id="p_org_website" placeholder="https://…"></div>
+          <div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-input" id="p_phone" placeholder="+33 6 …"></div>
+          <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="p_email" disabled style="opacity:0.5;cursor:not-allowed;"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:24px;">
+          <button class="btn btn-primary" onclick="saveProfile()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><polyline points="20 6 9 17 4 12"/></svg>
+            Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Paramètres -->
+    <div class="page" id="page-settings">
+      <div class="section-header">
+        <div><div class="section-title">Paramètres</div><div class="section-sub">Préférences et sécurité du compte</div></div>
+      </div>
+      <div class="form-card" style="margin-bottom:16px;">
+        <div class="section-title" style="font-size:0.9rem;margin-bottom:16px;">Notifications</div>
+        <div class="toggle-row">
+          <div class="toggle-info"><strong>Nouvelles inscriptions</strong><span>Recevoir un email à chaque nouvelle inscription</span></div>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><strong>Rappels avant événement</strong><span>Rappel 7 jours et 1 jour avant chaque événement</span></div>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><strong>Newsletter SUBX</strong><span>Nouveautés et conseils pour les organisateurs</span></div>
+          <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="section-title" style="font-size:0.9rem;margin-bottom:20px;">Changer le mot de passe</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Nouveau mot de passe</label><input type="password" class="form-input" id="s_new_pwd" placeholder="8 caractères minimum"></div>
+          <div class="form-group"><label class="form-label">Confirmer</label><input type="password" class="form-input" id="s_confirm_pwd" placeholder="Répéter le mot de passe"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+          <button class="btn btn-primary btn-sm" onclick="changePassword()">Mettre à jour</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <div style="color:#E57373;margin-bottom:16px;">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </div>
+    <h3>Supprimer l'événement ?</h3>
+    <p>Cette action est <strong>irréversible</strong>. L'événement sera définitivement supprimé avec toutes ses données.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeDeleteModal()">Annuler</button>
+      <button class="btn btn-danger btn-sm" id="confirmDeleteBtn" onclick="confirmDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const SUPABASE_URL = 'https://ipuryomreqlrhhutjnkq.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwdXJ5b21yZXFscmhodXRqbmtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjUxODEsImV4cCI6MjA5MDQ0MTE4MX0.yKO82AzFVYwI8TD2UhtqmrneGAHA32IA2gNDoZo7V8A';
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let currentUser = null, currentProfile = null, myEvents = [];
+  let editingEventId = null, pendingDeleteId = null, currentStep = 1;
+  let coverFile = null, coverExistingUrl = null;
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    const guard = document.getElementById('authGuard');
+
+    if (!session) {
+      guard.style.display = 'none';
+      document.getElementById('authModal').classList.add('active');
+      return;
+    }
+
+    if (!session.user.email_confirmed_at) {
+      guard.style.display = 'none';
+      document.getElementById('emailNotConfirmed').style.display = 'flex';
+      document.getElementById('unconfirmedEmail').textContent = session.user.email;
+      return;
+    }
+
+    await loadDashboard(session);
+  }
+
+  async function loadDashboard(session) {
+    const guard = document.getElementById('authGuard');
+    guard.style.display = 'flex';
+
+    currentUser = session.user;
+    let { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+
+    // Si pas encore organisateur → on lui accorde le rôle automatiquement
+    if (!profile?.is_organizer) {
+      await sb.from('profiles').update({ is_organizer: true }).eq('id', currentUser.id);
+      profile = { ...profile, is_organizer: true };
+    }
+    currentProfile = profile;
+
+    const displayName = profile?.full_name || currentUser.user_metadata?.full_name || currentUser.email;
+    document.getElementById('sidebarName').textContent = displayName;
+    document.getElementById('sidebarAvatar').textContent = displayName.charAt(0).toUpperCase();
+    if (profile?.avatar_url) document.getElementById('sidebarAvatar').innerHTML = `<img src="${profile.avatar_url}" alt="avatar">`;
+    fillProfileForm(profile);
+    guard.style.display = 'none';
+    document.getElementById('authModal').classList.remove('active');
+    document.getElementById('mainLayout').classList.add('ready');
+    setupFormatCheckboxes();
+    await loadEvents();
+  }
+
+  /* ============================
+     AUTH MODAL FUNCTIONS
+  ============================ */
+  window.switchAuthTab = function(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('formLogin').style.display = isLogin ? '' : 'none';
+    document.getElementById('formSignup').style.display = isLogin ? 'none' : '';
+    document.getElementById('confirmScreen').style.display = 'none';
+    document.getElementById('authTabs').style.display = '';
+    document.querySelectorAll('.auth-tab').forEach((t, i) => {
+      t.classList.toggle('active', isLogin ? i === 0 : i === 1);
+    });
+  };
+
+  window.handleOrgLogin = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('org_login_email').value.trim();
+    const pwd = document.getElementById('org_login_pwd').value;
+    const btn = document.getElementById('loginBtn');
+    const msg = document.getElementById('loginMsg');
+    btn.textContent = 'Connexion…'; btn.disabled = true;
+    msg.style.display = 'none';
+
+    // Vérifier le provider avant connexion
+    const { data: providerData } = await sb.rpc('get_user_provider', { user_email: email });
+    if (providerData === 'google') {
+      msg.className = 'auth-msg error'; msg.textContent = 'Ce compte est lié à Google. Connectez-vous depuis la page principale avec Google.'; msg.style.display = 'block';
+      btn.textContent = 'Se connecter'; btn.disabled = false;
+      return;
+    }
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+    btn.textContent = 'Se connecter'; btn.disabled = false;
+
+    if (error) {
+      msg.className = 'auth-msg error'; msg.textContent = 'Email ou mot de passe incorrect.'; msg.style.display = 'block';
+      return;
+    }
+    if (!data.session.user.email_confirmed_at) {
+      document.getElementById('authModal').classList.remove('active');
+      document.getElementById('emailNotConfirmed').style.display = 'flex';
+      document.getElementById('unconfirmedEmail').textContent = email;
+      return;
+    }
+    await loadDashboard(data.session);
+  };
+
+  window.handleOrgSignup = async function(e) {
+    e.preventDefault();
+    const name = document.getElementById('org_signup_name').value.trim();
+    const email = document.getElementById('org_signup_email').value.trim();
+    const pwd = document.getElementById('org_signup_pwd').value;
+    const btn = document.getElementById('signupBtn');
+    const msg = document.getElementById('signupMsg');
+    btn.textContent = 'Création…'; btn.disabled = true;
+    msg.style.display = 'none';
+
+    // Vérifier si l'email existe déjà
+    const { data: providerData } = await sb.rpc('get_user_provider', { user_email: email });
+    if (providerData === 'google') {
+      msg.className = 'auth-msg error'; msg.textContent = 'Cet email est lié à un compte Google. Connectez-vous avec Google depuis la page principale, puis revenez ici.'; msg.style.display = 'block';
+      btn.textContent = 'Créer mon espace organisateur'; btn.disabled = false;
+      return;
+    }
+    if (providerData === 'email') {
+      msg.className = 'auth-msg error'; msg.textContent = 'Un compte existe déjà avec cet email. Utilisez l\'onglet Connexion.'; msg.style.display = 'block';
+      btn.textContent = 'Créer mon espace organisateur'; btn.disabled = false;
+      return;
+    }
+
+    const { data, error } = await sb.auth.signUp({
+      email, password: pwd,
+      options: { data: { full_name: name, is_organizer: true } }
+    });
+    btn.textContent = 'Créer mon espace organisateur'; btn.disabled = false;
+
+    if (error) {
+      msg.className = 'auth-msg error'; msg.textContent = error.message; msg.style.display = 'block';
+      return;
+    }
+
+    // Si email déjà confirmé (mailer_autoconfirm activé)
+    if (data.session?.user?.email_confirmed_at) {
+      await loadDashboard(data.session);
+      return;
+    }
+
+    // Sinon afficher l'écran de confirmation
+    document.getElementById('authTabs').style.display = 'none';
+    document.getElementById('formSignup').style.display = 'none';
+    document.getElementById('confirmEmailAddr').textContent = email;
+    document.getElementById('confirmScreen').style.display = 'block';
+  };
+
+  // Gérer le retour depuis le lien de confirmation email
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session?.user?.email_confirmed_at) {
+      const modal = document.getElementById('authModal');
+      if (modal.classList.contains('active') || document.getElementById('confirmScreen').style.display === 'block') {
+        await loadDashboard(session);
+      }
+    }
+  });
+
+  window.showPage = function(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    const navItem = document.querySelector(`.nav-item[data-page="${name}"]`);
+    if (navItem) navItem.classList.add('active');
+    const titles = { overview: "Vue d'ensemble", events: 'Mes événements', create: 'Créer un événement', profil: 'Mon profil', settings: 'Paramètres' };
+    document.getElementById('topbarTitle').textContent = titles[name] || name;
+  };
+
+  window.openCreateForm = function(eventData) {
+    editingEventId = null; coverFile = null; coverExistingUrl = null;
+    resetForm();
+    if (eventData) {
+      editingEventId = eventData.id;
+      fillEventForm(eventData);
+      document.getElementById('formPageTitle').textContent = "Modifier l'événement";
+      document.getElementById('submitBtnText').textContent = 'Mettre à jour';
+    } else {
+      document.getElementById('formPageTitle').textContent = 'Créer un événement';
+      document.getElementById('submitBtnText').textContent = "Enregistrer l'événement";
+    }
+    document.getElementById('successScreen').classList.remove('active');
+    document.getElementById('createFormWrapper').style.display = '';
+    showPage('create');
+    document.querySelector('.nav-item[data-page="create"]').classList.add('active');
+    goStep(1);
+  };
+
+  async function loadEvents() {
+    const { data, error } = await sb.from('event').select('*').eq('organizer_id', currentUser.id).order('date', { ascending: false });
+    if (error) { console.error(error); return; }
+    myEvents = data || [];
+    renderStats();
+    renderEventsList('recentEventsList', myEvents.slice(0, 3));
+    renderEventsList('allEventsList', myEvents);
+    document.getElementById('navEventCount').textContent = myEvents.length;
+    document.getElementById('eventsSubtitle').textContent = `${myEvents.length} événement${myEvents.length > 1 ? 's' : ''} créé${myEvents.length > 1 ? 's' : ''}`;
+  }
+
+  function renderStats() {
+    const published = myEvents.filter(e => e.published).length;
+    const drafts = myEvents.filter(e => !e.published).length;
+    document.getElementById('statPublished').textContent = published;
+    document.getElementById('statTotal').textContent = myEvents.length;
+    document.getElementById('statDrafts').textContent = drafts;
+    const upcoming = myEvents.filter(e => e.date && new Date(e.date) > new Date() && e.published).sort((a,b) => new Date(a.date) - new Date(b.date));
+    if (upcoming.length > 0) {
+      const days = Math.ceil((new Date(upcoming[0].date) - new Date()) / 86400000);
+      document.getElementById('statNext').textContent = days > 0 ? `J-${days}` : "Aujourd'hui";
+    }
+  }
+
+  function renderEventsList(containerId, events) {
+    const container = document.getElementById(containerId);
+    if (!events || events.length === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><h3>Aucun événement</h3><p>Créez votre premier événement pour commencer.</p><button class="btn btn-primary btn-sm" onclick="openCreateForm()">Créer un événement</button></div>`;
+      return;
+    }
+    container.innerHTML = events.map(ev => renderEventCard(ev)).join('');
+  }
+
+  function renderEventCard(ev) {
+    const isPublished = !!ev.published;
+    const statusLabel = isPublished ? 'Publié' : 'Brouillon';
+    const statusClass = isPublished ? 'status-published' : 'status-draft';
+    const dateStr = ev.date ? new Date(ev.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+    const cover = ev.image_url ? `<img class="event-card-cover" src="${ev.image_url}" alt="cover" onerror="this.style.display='none'">` : `<div class="event-card-cover-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    const formats = Array.isArray(ev.formats) ? ev.formats.slice(0,3).map(f => `<span class="chip">${f}</span>`).join('') : '';
+    const evJson = JSON.stringify(ev).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    return `<div class="event-card">${cover}<div class="event-card-body"><div class="event-card-name">${ev.name || '—'}</div><div class="event-card-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${dateStr}</span>${ev.city ? `<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${ev.city}</span>` : ''}${ev.race_type ? `<span>${ev.race_type}</span>` : ''}</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${formats}</div></div><div class="event-card-actions"><span class="status-badge ${statusClass}">${statusLabel}</span><div style="display:flex;flex-direction:column;gap:6px;"><button class="btn btn-outline btn-sm" onclick='openEditEvent(${evJson})'>Modifier</button><button class="btn btn-danger btn-sm" onclick="askDelete('${ev.id}')">Supprimer</button></div></div></div>`;
+  }
+
+  window.openEditEvent = function(ev) { openCreateForm(ev); };
+
+  window.goStep = function(n) {
+    if (n > currentStep && !validateStep(currentStep)) return;
+    currentStep = n;
+    for (let i = 1; i <= 4; i++) {
+      const s = document.getElementById(`formStep${i}`);
+      if (s) s.style.display = i === n ? '' : 'none';
+      const circle = document.getElementById(`step-circle-${i}`);
+      const label = document.getElementById(`step-label-${i}`);
+      if (circle && label) {
+        circle.className = 'step-circle' + (i < n ? ' done' : i === n ? ' active' : '');
+        label.className = 'step-label' + (i < n ? ' done' : i === n ? ' active' : '');
+        circle.textContent = i < n ? '✓' : String(i);
+      }
+      if (i < 4) { const conn = document.getElementById(`conn-${i}`); if (conn) conn.className = 'step-connector' + (i < n ? ' done' : ''); }
+    }
+  };
+
+  function validateStep(step) {
+    if (step === 1) {
+      if (!document.getElementById('f_name').value.trim()) { showToast("Le nom de l'événement est obligatoire", 'error'); return false; }
+      if (!document.getElementById('f_race_type').value) { showToast('Le type de course est obligatoire', 'error'); return false; }
+    }
+    if (step === 2) {
+      if (!document.getElementById('f_date').value) { showToast('La date de début est obligatoire', 'error'); return false; }
+      if (!document.getElementById('f_city').value.trim()) { showToast('La ville est obligatoire', 'error'); return false; }
+    }
+    if (step === 3) {
+      if (!document.querySelectorAll('#formatsGrid input:checked').length) { showToast('Sélectionnez au moins un format', 'error'); return false; }
+    }
+    return true;
+  }
+
+  function setupFormatCheckboxes() {
+    document.querySelectorAll('#formatsGrid input[type="checkbox"]').forEach(cb => cb.addEventListener('change', syncPricesTable));
+  }
+
+  function syncPricesTable() {
+    const checked = [...document.querySelectorAll('#formatsGrid input[type="checkbox"]:checked')];
+    const table = document.getElementById('pricesTable');
+    if (!checked.length) { table.innerHTML = '<div style="font-size:0.78rem;color:rgba(255,255,255,0.25);padding:12px 0;">Sélectionnez des formats pour définir les tarifs</div>'; return; }
+    const existing = {};
+    table.querySelectorAll('.price-row').forEach(row => { const inp = row.querySelector('input'); if (inp) existing[row.dataset.format] = inp.value; });
+    table.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr 36px;gap:10px;margin-bottom:4px;padding:0 2px;"><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.07em;color:rgba(255,255,255,0.3);font-weight:600;">Format</div><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.07em;color:rgba(255,255,255,0.3);font-weight:600;">Tarif (€)</div><div></div></div>` + checked.map(cb => {
+      const fmt = cb.value;
+      return `<div class="price-row" data-format="${fmt}"><div class="price-row-label">${fmt}</div><input type="number" class="form-input" placeholder="Ex : 45" min="0" step="0.01" value="${existing[fmt]||''}"><button type="button" class="btn-remove-price" onclick="uncheckFormat('${cb.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
+    }).join('');
+  }
+
+  window.uncheckFormat = function(cbId) { const cb = document.getElementById(cbId); if (cb) { cb.checked = false; cb.dispatchEvent(new Event('change')); } };
+
+  window.handleCoverChange = function(input) {
+    if (!input.files?.[0]) return;
+    coverFile = input.files[0];
+    const url = URL.createObjectURL(coverFile);
+    const preview = document.getElementById('coverPreview');
+    preview.src = url; preview.style.display = 'block';
+    document.getElementById('coverIcon').style.display = 'none';
+    document.getElementById('coverText').style.display = 'none';
+    document.getElementById('coverZone').classList.add('has-image');
+    document.getElementById('coverFileName').textContent = `✓ ${coverFile.name}`;
+    document.getElementById('coverFileName').style.display = 'block';
+  };
+
+  async function uploadCoverImage() {
+    if (!coverFile) return coverExistingUrl;
+    const ext = coverFile.name.split('.').pop();
+    const path = `${currentUser.id}/${Date.now()}.${ext}`;
+    const { error } = await sb.storage.from('event-covers').upload(path, coverFile, { upsert: true });
+    if (error) { console.error('Cover upload error:', error); return null; }
+    return sb.storage.from('event-covers').getPublicUrl(path).data.publicUrl;
+  }
+
+  window.submitEvent = async function() {
+    if (!validateStep(3)) return;
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Enregistrement…';
+    const imageUrl = await uploadCoverImage();
+    const formats = [...document.querySelectorAll('#formatsGrid input:checked')].map(cb => cb.value);
+    const prices = {};
+    document.querySelectorAll('#pricesTable .price-row').forEach(row => { const val = row.querySelector('input')?.value; if (val) prices[row.dataset.format] = parseFloat(val); });
+    const priceFrom = Object.values(prices).length ? Math.min(...Object.values(prices)) : null;
+    const payload = {
+      name: document.getElementById('f_name').value.trim(),
+      race_type: document.getElementById('f_race_type').value,
+      level: document.getElementById('f_level').value || null,
+      description: document.getElementById('f_description').value.trim() || null,
+      date: document.getElementById('f_date').value || null,
+      date_end: document.getElementById('f_date_end').value || null,
+      city: document.getElementById('f_city').value.trim(),
+      address: document.getElementById('f_address').value.trim() || null,
+      venue: document.getElementById('f_venue').value.trim() || null,
+      website: document.getElementById('f_website').value.trim() || null,
+      distance_km: parseFloat(document.getElementById('f_distance').value) || null,
+      elevation_m: parseInt(document.getElementById('f_elevation').value) || null,
+      max_participants: parseInt(document.getElementById('f_max_participants').value) || null,
+      formats, prices, price_from: priceFrom,
+      published: document.getElementById('f_published').checked,
+      organizer_id: currentUser.id,
+      organizer_name: currentProfile?.full_name || currentUser.email,
+    };
+    if (imageUrl) payload.image_url = imageUrl;
+    let error;
+    if (editingEventId) ({ error } = await sb.from('event').update(payload).eq('id', editingEventId));
+    else ({ error } = await sb.from('event').insert(payload));
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="20 6 9 17 4 12"/></svg><span id="submitBtnText">${editingEventId ? 'Mettre à jour' : "Enregistrer l'événement"}</span>`;
+    if (error) { console.error(error); showToast('Erreur : ' + (error.message || 'inconnue'), 'error'); return; }
+    await loadEvents();
+    document.getElementById('createFormWrapper').style.display = 'none';
+    document.getElementById('successTitle').textContent = editingEventId ? 'Événement mis à jour !' : 'Événement créé !';
+    document.getElementById('successDesc').textContent = editingEventId ? 'Vos modifications ont été enregistrées.' : 'Votre événement a été ' + (payload.published ? 'publié sur SUBX.' : 'enregistré en brouillon.');
+    document.getElementById('successScreen').classList.add('active');
+    showToast(editingEventId ? 'Événement mis à jour !' : 'Événement créé !', 'success');
+  };
+
+  function resetForm() {
+    ['f_name','f_description','f_date','f_date_end','f_city','f_address','f_venue','f_website','f_distance','f_elevation','f_max_participants'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('f_race_type').value = '';
+    document.getElementById('f_level').value = '';
+    document.getElementById('f_published').checked = false;
+    document.querySelectorAll('#formatsGrid input').forEach(cb => cb.checked = false);
+    document.getElementById('pricesTable').innerHTML = '<div style="font-size:0.78rem;color:rgba(255,255,255,0.25);padding:12px 0;">Sélectionnez des formats pour définir les tarifs</div>';
+    coverFile = null; coverExistingUrl = null;
+    document.getElementById('coverPreview').style.display = 'none';
+    document.getElementById('coverPreview').src = '';
+    document.getElementById('coverIcon').style.display = '';
+    document.getElementById('coverText').style.display = '';
+    document.getElementById('coverZone').classList.remove('has-image');
+    document.getElementById('coverFileName').style.display = 'none';
+    document.getElementById('f_cover_input').value = '';
+  }
+
+  function fillEventForm(ev) {
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+    setVal('f_name', ev.name); setVal('f_race_type', ev.race_type); setVal('f_level', ev.level);
+    setVal('f_description', ev.description); setVal('f_city', ev.city);
+    setVal('f_address', ev.address); setVal('f_venue', ev.venue); setVal('f_website', ev.website);
+    setVal('f_distance', ev.distance_km); setVal('f_elevation', ev.elevation_m); setVal('f_max_participants', ev.max_participants);
+    if (ev.date) setVal('f_date', ev.date.slice(0,10));
+    if (ev.date_end) setVal('f_date_end', ev.date_end.slice(0,10));
+    document.getElementById('f_published').checked = !!ev.published;
+    if (Array.isArray(ev.formats)) {
+      document.querySelectorAll('#formatsGrid input').forEach(cb => { cb.checked = ev.formats.includes(cb.value); });
+      syncPricesTable();
+      if (ev.prices) Object.entries(ev.prices).forEach(([fmt, val]) => { const row = document.querySelector(`#pricesTable .price-row[data-format="${fmt}"] input`); if (row) row.value = val; });
+    }
+    if (ev.image_url) {
+      coverExistingUrl = ev.image_url;
+      const preview = document.getElementById('coverPreview');
+      preview.src = ev.image_url; preview.style.display = 'block';
+      document.getElementById('coverIcon').style.display = 'none';
+      document.getElementById('coverText').style.display = 'none';
+      document.getElementById('coverZone').classList.add('has-image');
+      document.getElementById('coverFileName').textContent = '✓ Image existante';
+      document.getElementById('coverFileName').style.display = 'block';
+    }
+  }
+
+  window.askDelete = function(id) { pendingDeleteId = id; document.getElementById('deleteModal').classList.add('active'); };
+  window.closeDeleteModal = function() { document.getElementById('deleteModal').classList.remove('active'); pendingDeleteId = null; };
+  window.confirmDelete = async function() {
+    if (!pendingDeleteId) return;
+    const btn = document.getElementById('confirmDeleteBtn');
+    btn.textContent = 'Suppression…'; btn.disabled = true;
+    const { error } = await sb.from('event').delete().eq('id', pendingDeleteId).eq('organizer_id', currentUser.id);
+    btn.textContent = 'Supprimer'; btn.disabled = false;
+    closeDeleteModal();
+    if (error) { showToast('Erreur lors de la suppression', 'error'); return; }
+    showToast('Événement supprimé', 'success');
+    await loadEvents();
+  };
+
+  function fillProfileForm(profile) {
+    if (!profile) return;
+    const fullName = profile.full_name || '';
+    const parts = fullName.split(' ');
+    document.getElementById('p_first_name').value = parts[0] || '';
+    document.getElementById('p_last_name').value = parts.slice(1).join(' ') || '';
+    document.getElementById('p_org_name').value = profile.org_name || '';
+    document.getElementById('p_org_website').value = profile.org_website || '';
+    document.getElementById('p_phone').value = profile.phone || '';
+    document.getElementById('p_email').value = currentUser?.email || '';
+    if (profile.avatar_url) document.getElementById('profileAvatar').innerHTML = `<img src="${profile.avatar_url}" alt="avatar">`;
+    else document.getElementById('profileAvatar').textContent = (fullName || currentUser?.email || '?').charAt(0).toUpperCase();
+  }
+
+  window.saveProfile = async function() {
+    const firstName = document.getElementById('p_first_name').value.trim();
+    const lastName = document.getElementById('p_last_name').value.trim();
+    const fullName = [firstName, lastName].filter(Boolean).join(' ');
+    const { error } = await sb.from('profiles').update({ full_name: fullName, org_name: document.getElementById('p_org_name').value.trim() || null, org_website: document.getElementById('p_org_website').value.trim() || null, phone: document.getElementById('p_phone').value.trim() || null }).eq('id', currentUser.id);
+    if (error) { showToast('Erreur lors de la sauvegarde', 'error'); return; }
+    document.getElementById('sidebarName').textContent = fullName || currentUser.email;
+    document.getElementById('sidebarAvatar').textContent = (fullName || currentUser.email).charAt(0).toUpperCase();
+    showToast('Profil mis à jour !', 'success');
+  };
+
+  window.uploadAvatar = async function(input) {
+    if (!input.files?.[0]) return;
+    const file = input.files[0];
+    const ext = file.name.split('.').pop();
+    const path = `${currentUser.id}/avatar.${ext}`;
+    const { error: uploadErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true });
+    if (uploadErr) { showToast('Erreur upload avatar', 'error'); return; }
+    const avatarUrl = sb.storage.from('avatars').getPublicUrl(path).data.publicUrl + '?t=' + Date.now();
+    await sb.from('profiles').update({ avatar_url: avatarUrl }).eq('id', currentUser.id);
+    document.getElementById('profileAvatar').innerHTML = `<img src="${avatarUrl}" alt="avatar">`;
+    document.getElementById('sidebarAvatar').innerHTML = `<img src="${avatarUrl}" alt="avatar">`;
+    showToast('Photo mise à jour !', 'success');
+  };
+
+  window.changePassword = async function() {
+    const pwd = document.getElementById('s_new_pwd').value;
+    const confirm = document.getElementById('s_confirm_pwd').value;
+    if (!pwd || pwd.length < 8) { showToast('Minimum 8 caractères', 'error'); return; }
+    if (pwd !== confirm) { showToast('Les mots de passe ne correspondent pas', 'error'); return; }
+    const { error } = await sb.auth.updateUser({ password: pwd });
+    if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
+    document.getElementById('s_new_pwd').value = '';
+    document.getElementById('s_confirm_pwd').value = '';
+    showToast('Mot de passe mis à jour !', 'success');
+  };
+
+  window.logout = async function() { await sb.auth.signOut(); window.location.href = 'index.html'; };
+
+  window.resendConfirmation = async function() {
+    const email = currentUser?.email || document.getElementById('unconfirmedEmail').textContent;
+    if (!email) return;
+    await sb.auth.resend({ type: 'signup', email });
+    showToast('Email de confirmation renvoyé !', 'success');
+  };
+
+  window.showToast = function(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg; toast.className = `toast show ${type}`;
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => { toast.className = 'toast'; }, 3500);
+  };
+
+  init();
+</script>
+</body>
+</html>

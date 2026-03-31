@@ -1489,10 +1489,27 @@
     // Callback OAuth Google — doit être avant DOMContentLoaded
     sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session && (window.location.search.includes('code=') || window.location.hash.includes('access_token'))) {
-        const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-        window.location.replace((profile?.role === 'organizer') ? 'organisateur.html' : 'profil.html');
+        const isNewUser = (new Date() - new Date(session.user.created_at)) < 120000;
+        if (isNewUser) {
+          // Nouvel utilisateur Google → sélection du rôle
+          document.getElementById('googleRoleOverlay').style.display = 'flex';
+          document.getElementById('googleRoleOverlay').dataset.uid = session.user.id;
+        } else {
+          const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+          window.location.replace(profile?.role === 'organizer' ? 'organisateur.html' : 'profil.html');
+        }
       }
     });
+
+    window.selectGoogleRole = async function(role) {
+      const overlay = document.getElementById('googleRoleOverlay');
+      const uid = overlay.dataset.uid;
+      const btn = overlay.querySelector(`[data-role="${role}"]`);
+      btn.disabled = true;
+      btn.textContent = '…';
+      await sb.from('profiles').update({ role, is_organizer: role === 'organizer' }).eq('id', uid);
+      window.location.replace(role === 'organizer' ? 'organisateur.html' : 'profil.html');
+    };
 
     function formatDate(iso) {
       const d = new Date(iso + 'T12:00:00');
@@ -2104,6 +2121,29 @@
       if (e.key === 'Escape') closeAuthModal();
     });
   </script>
+
+  <!-- ========== GOOGLE ROLE SELECTION ========== -->
+  <div id="googleRoleOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:20px;padding:36px 28px;max-width:420px;width:90%;text-align:center;">
+      <div style="width:48px;height:48px;background:rgba(124,185,40,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7CB928" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h2 style="font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:700;color:#1a1a1a;margin-bottom:6px;">Tu rejoins SUBX en tant que…</h2>
+      <p style="font-size:0.78rem;color:#888;margin-bottom:24px;font-family:'Montserrat',sans-serif;">Tu pourras modifier ça dans ton profil.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <button data-role="athlete" onclick="selectGoogleRole('athlete')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px 12px;border:2px solid #e0e0e0;border-radius:14px;background:#f7f7f7;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:700;color:#333;transition:all 0.2s;position:relative;overflow:hidden;" onmouseover="this.style.borderColor='#7CB928'" onmouseout="this.style.borderColor='#e0e0e0'">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7CB928" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Athlète
+          <span style="font-size:0.65rem;color:#999;font-weight:400;">Je participe aux courses</span>
+        </button>
+        <button data-role="organizer" onclick="selectGoogleRole('organizer')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px 12px;border:2px solid #e0e0e0;border-radius:14px;background:#f7f7f7;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:700;color:#333;transition:all 0.2s;" onmouseover="this.style.borderColor='#7CB928'" onmouseout="this.style.borderColor='#e0e0e0'">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7CB928" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Organisateur
+          <span style="font-size:0.65rem;color:#999;font-weight:400;">Je crée des événements</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ========== AUTH MODAL ========== -->
   <div class="auth-overlay" id="authOverlay" onclick="handleOverlayClick(event)">

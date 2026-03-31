@@ -191,11 +191,9 @@
       background: none;
       border: none;
       color: var(--white);
-      font-size: 1.875rem;
       cursor: pointer;
-      line-height: 1;
       padding: 0;
-      vertical-align: middle;
+      line-height: 0;
     }
 
     .mobile-menu {
@@ -1306,7 +1304,9 @@
         <button class="navbar-avatar" id="navAvatarMobile" aria-label="Mon profil" onclick="window.location.href='profil.html'" style="display:none;">
           <div class="navbar-avatar-initials" id="navAvatarInitialsMobile"></div>
         </button>
-        <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
+        <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+          <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
       </div>
     </div>
 

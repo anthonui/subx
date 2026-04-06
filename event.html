@@ -1821,6 +1821,7 @@
         rows.push({
           athlete_id:    currentUser.id,
           event_id:      currentEvent.id,
+          ticket_type_id: (window._subxTickets || []).length > 0 ? String(t.id) : null,
           ticket_id:     String(t.id),
           ticket_name:   t.name,
           ticket_format: t.format || null,

@@ -621,6 +621,378 @@
     @media (max-width: 480px) {
       .footer-grid { grid-template-columns: 1fr; }
     }
+
+    /* ========== MODAL INSCRIPTION ========== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 620px;
+      max-height: 92vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+      animation: modalIn 0.25s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 28px 28px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+
+    .modal-header-left {}
+    .modal-header-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+    .modal-header-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--black);
+      letter-spacing: 0.02em;
+    }
+    .modal-header-subtitle {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .modal-close {
+      background: #f5f5f5;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      flex-shrink: 0;
+      transition: background 0.2s, color 0.2s;
+      margin-top: 2px;
+    }
+    .modal-close:hover { background: #ececec; color: var(--black); }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+    }
+
+    .modal-section-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #aaa;
+      margin-bottom: 14px;
+    }
+
+    /* ---- Ticket row ---- */
+    .ticket-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .ticket-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 1.5px solid #ebebeb;
+      border-radius: 14px;
+      padding: 18px 20px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ticket-row.selected {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(124,185,40,0.1);
+    }
+    .ticket-row.sold-out { opacity: 0.5; pointer-events: none; }
+
+    .ticket-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(124,185,40,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--green);
+    }
+    .ticket-row.sold-out .ticket-icon { background: #f5f5f5; color: #bbb; }
+
+    .ticket-info { flex: 1; min-width: 0; }
+    .ticket-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--black);
+      letter-spacing: 0.02em;
+    }
+    .ticket-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 5px;
+    }
+    .ticket-badge {
+      font-size: 0.63rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .ticket-badge--level   { background: rgba(26,26,26,0.07); color: #555; }
+    .ticket-badge--places  { background: rgba(255,140,0,0.1);  color: #c47000; }
+    .ticket-badge--ok      { background: rgba(124,185,40,0.1); color: var(--green); }
+    .ticket-badge--soldout { background: rgba(229,57,53,0.1);  color: #e53935; }
+
+    .ticket-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .ticket-price {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--black);
+    }
+    .ticket-price span { font-size: 0.75rem; color: #aaa; font-weight: 400; }
+
+    /* Stepper */
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .stepper-btn {
+      background: none;
+      border: none;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      font-weight: 700;
+    }
+    .stepper-btn:hover { background: #f5f5f5; color: var(--black); }
+    .stepper-btn.plus:hover { background: rgba(124,185,40,0.1); color: var(--green); }
+    .stepper-val {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      min-width: 32px;
+      text-align: center;
+      color: var(--black);
+      border-left: 1px solid #e8e8e8;
+      border-right: 1px solid #e8e8e8;
+      height: 34px;
+      line-height: 34px;
+    }
+
+    /* ---- Empty state ---- */
+    .modal-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+      font-size: 0.88rem;
+    }
+    .modal-empty strong { display: block; font-size: 1.05rem; color: #555; margin-bottom: 6px; }
+
+    /* ---- Footer ---- */
+    .modal-footer {
+      padding: 20px 28px 24px;
+      border-top: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+
+    .modal-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-total-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .modal-total-value {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--black);
+    }
+    .modal-total-value small {
+      font-size: 0.75rem;
+      color: #aaa;
+      font-weight: 400;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-cart {
+      padding: 14px;
+      background: rgba(26,26,26,0.06);
+      color: var(--black);
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .btn-cart:hover { background: #f0f0f0; border-color: #ccc; }
+    .btn-cart:disabled { opacity: 0.4; cursor: default; }
+
+    .btn-pay {
+      padding: 14px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .btn-pay:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .btn-pay:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+    .modal-disclaimer {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 0.72rem;
+      color: #bbb;
+    }
+
+    /* Spinner dans bouton payer */
+    @keyframes spinBtn {
+      to { transform: rotate(360deg); }
+    }
+    .btn-pay svg.spin, .btn-cart svg.spin {
+      animation: spinBtn 0.7s linear infinite;
+    }
+
+    /* ---- Toast ---- */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      background: var(--black);
+      color: var(--white);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 0.85rem;
+      border-left: 4px solid var(--green);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 260px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      animation: toastIn 0.3s ease;
+    }
+    .toast.error { border-left-color: #E53935; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ---- Cart badge ---- */
+    .cart-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--green);
+      color: white;
+      font-size: 0.6rem;
+      font-weight: 700;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .navbar-icon { position: relative; }
+
+    @media (max-width: 600px) {
+      .modal-header { padding: 20px 20px 16px; }
+      .modal-body { padding: 16px 20px; }
+      .modal-footer { padding: 16px 20px 20px; }
+      .modal-actions { grid-template-columns: 1fr; }
+      .modal-header-title { font-size: 1.2rem; }
+    }
   </style>
 </head>
 <body>
@@ -683,6 +1055,50 @@
     </div>
   </div>
 
+  <!-- ========== MODAL INSCRIPTION ========== -->
+  <div class="modal-overlay" id="inscriptionOverlay" role="dialog" aria-modal="true" aria-label="Inscription à l'événement">
+    <div class="modal" id="inscriptionModal">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <p class="modal-header-eyebrow">Inscription</p>
+          <h2 class="modal-header-title" id="modalEventName">Choisissez vos tickets</h2>
+          <p class="modal-header-subtitle" id="modalEventMeta"></p>
+        </div>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-section-title">Sélectionnez vos tickets</p>
+        <div class="ticket-list" id="ticketList">
+          <div class="modal-empty"><strong>Chargement…</strong></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-total-row">
+          <span class="modal-total-label">Total</span>
+          <span class="modal-total-value" id="modalTotal">€0 <small>TTC</small></span>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cart" id="btnAddCart" disabled onclick="addToCart()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Ajouter au panier
+          </button>
+          <button class="btn-pay" id="btnPayNow" disabled onclick="payNow()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+            Payer maintenant
+          </button>
+        </div>
+        <p class="modal-disclaimer">Paiement sécurisé · Annulation possible jusqu'à 30j avant l'événement</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TOAST CONTAINER ========== -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
     <div class="container">
@@ -715,6 +1131,13 @@
       'https://ipuryomreqlrhhutjnkq.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwdXJ5b21yZXFscmhodXRqbmtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjUxODEsImV4cCI6MjA5MDQ0MTE4MX0.yKO82AzFVYwI8TD2UhtqmrneGAHA32IA2gNDoZo7V8A'
     );
+
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
     function formatDate(iso) {
       const d = new Date(iso + 'T12:00:00');
@@ -882,7 +1305,7 @@
                 </div>` : ''}
               </div>
 
-              <button class="btn-register">S'inscrire</button>
+              <button class="btn-register" onclick="openModal(window._subxEvent)">S'inscrire</button>
 
               ${e.organizer_name ? `
               <div class="sidebar-organizer">
@@ -893,6 +1316,7 @@
         </div>
       `;
 
+      window._subxEvent = e;
       return e;
     }
 
@@ -959,9 +1383,343 @@
       });
     }
 
+    // =============================================
+    //  MODAL INSCRIPTION
+    // =============================================
+
+    let currentEvent = null;
+    let currentUser  = null;
+    let ticketSelections = {}; // { ticketId: qty }
+
+    const LEVEL_LABELS = {
+      debutant: 'Débutant',
+      intermediaire: 'Intermédiaire',
+      expert: 'Expert',
+      elite: 'Élite'
+    };
+
+    const FORMAT_ICONS = {
+      solo: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>`,
+      duo:  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+      equipe: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+      relais: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>`
+    };
+
+    function buildTickets(e) {
+      // Build ticket options from formats × levels with prices
+      const formats  = (e.formats  || []).map(f => String(f).toLowerCase());
+      const levels   = (e.level    || []).map(l => String(l).toLowerCase());
+      const prices   = e.prices    || {};  // JSONB: { "solo": 45, "duo": 35, … } or nested
+
+      const tickets = [];
+
+      if (formats.length === 0) {
+        // Fallback: single ticket from price_from
+        tickets.push({
+          id: 'default',
+          name: 'Inscription Standard',
+          format: null,
+          levels: levels,
+          price: parseFloat(e.price_from) || 0,
+          places: e.max_participants || null,
+          soldOut: false
+        });
+        return tickets;
+      }
+
+      formats.forEach(fmt => {
+        // Try to find price: prices[fmt], prices[fmt.capitalize()], or price_from
+        const fmtKey = fmt;
+        const fmtKeyCapital = fmt.charAt(0).toUpperCase() + fmt.slice(1);
+        let price = prices[fmtKey] ?? prices[fmtKeyCapital] ?? prices[fmt.toUpperCase()] ?? parseFloat(e.price_from) ?? 0;
+        price = parseFloat(price) || 0;
+
+        // If price is an object (nested per level), create one ticket per level
+        if (typeof prices[fmtKey] === 'object' && prices[fmtKey] !== null && !Array.isArray(prices[fmtKey])) {
+          const nested = prices[fmtKey];
+          Object.entries(nested).forEach(([lvl, p]) => {
+            tickets.push({
+              id: `${fmt}_${lvl}`,
+              name: fmtKeyCapital,
+              format: fmt,
+              levels: [lvl],
+              price: parseFloat(p) || 0,
+              places: null,
+              soldOut: false
+            });
+          });
+        } else {
+          tickets.push({
+            id: fmt,
+            name: fmtKeyCapital,
+            format: fmt,
+            levels: levels.length > 0 ? levels : [],
+            price,
+            places: null,
+            soldOut: false
+          });
+        }
+      });
+
+      return tickets;
+    }
+
+    function renderTickets(tickets) {
+      const list = document.getElementById('ticketList');
+
+      if (!tickets.length) {
+        list.innerHTML = `<div class="modal-empty"><strong>Aucun ticket disponible</strong>Revenez bientôt pour découvrir les inscriptions disponibles.</div>`;
+        return;
+      }
+
+      list.innerHTML = tickets.map(t => {
+        const iconSvg = FORMAT_ICONS[t.format] || FORMAT_ICONS['solo'];
+        const levelBadges = t.levels.map(l =>
+          `<span class="ticket-badge ticket-badge--level">${LEVEL_LABELS[l] || l}</span>`
+        ).join('');
+        const placesBadge = t.soldOut
+          ? `<span class="ticket-badge ticket-badge--soldout">Complet</span>`
+          : t.places !== null
+            ? t.places <= 10
+              ? `<span class="ticket-badge ticket-badge--places">${t.places} places restantes</span>`
+              : `<span class="ticket-badge ticket-badge--ok">${t.places} places dispo.</span>`
+            : '';
+
+        return `
+          <div class="ticket-row${t.soldOut ? ' sold-out' : ''}" id="ticket-row-${escHtml(t.id)}">
+            <div class="ticket-icon">${iconSvg}</div>
+            <div class="ticket-info">
+              <div class="ticket-name">${escHtml(t.name)}</div>
+              <div class="ticket-meta">
+                ${levelBadges}
+                ${placesBadge}
+              </div>
+            </div>
+            <div class="ticket-right">
+              <div class="ticket-price">€${t.price % 1 === 0 ? t.price : t.price.toFixed(2)} <span>/ pers.</span></div>
+              <div class="stepper">
+                <button class="stepper-btn minus" onclick="changeQty('${escHtml(t.id)}', -1)" aria-label="Réduire">−</button>
+                <span class="stepper-val" id="qty-${escHtml(t.id)}">0</span>
+                <button class="stepper-btn plus" onclick="changeQty('${escHtml(t.id)}', 1)" aria-label="Augmenter">+</button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function changeQty(ticketId, delta) {
+      const current = ticketSelections[ticketId] || 0;
+      const next = Math.max(0, Math.min(current + delta, 10));
+      ticketSelections[ticketId] = next;
+
+      const valEl = document.getElementById('qty-' + ticketId);
+      if (valEl) valEl.textContent = next;
+
+      const row = document.getElementById('ticket-row-' + ticketId);
+      if (row) row.classList.toggle('selected', next > 0);
+
+      updateModalTotal();
+    }
+
+    function updateModalTotal() {
+      if (!currentEvent) return;
+      const tickets = buildTickets(currentEvent);
+      let total = 0;
+      tickets.forEach(t => {
+        total += (ticketSelections[t.id] || 0) * t.price;
+      });
+
+      const hasSelection = Object.values(ticketSelections).some(q => q > 0);
+      document.getElementById('modalTotal').innerHTML = `€${total % 1 === 0 ? total : total.toFixed(2)} <small>TTC</small>`;
+      document.getElementById('btnAddCart').disabled = !hasSelection;
+      document.getElementById('btnPayNow').disabled  = !hasSelection;
+    }
+
+    async function openModal(eventData) {
+      // Vérifier si l'utilisateur est connecté
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) {
+        showToast('Connectez-vous pour vous inscrire à cet événement.', 'error');
+        setTimeout(() => { window.location.href = 'index.html#auth'; }, 1800);
+        return;
+      }
+
+      currentEvent = eventData;
+      currentUser  = user;
+      ticketSelections = {};
+
+      document.getElementById('modalEventName').textContent = eventData.name;
+      document.getElementById('modalEventMeta').textContent =
+        [formatDate(eventData.date), eventData.city].filter(Boolean).join(' · ');
+
+      const tickets = buildTickets(eventData);
+      renderTickets(tickets);
+      updateModalTotal();
+
+      document.getElementById('inscriptionOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('inscriptionOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close on overlay click
+    document.getElementById('inscriptionOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // =============================================
+    //  PANIER (localStorage)
+    // =============================================
+
+    function getCart() {
+      try { return JSON.parse(localStorage.getItem('subx_cart') || '[]'); } catch { return []; }
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem('subx_cart', JSON.stringify(cart));
+      updateCartBadge();
+    }
+
+    function addToCart() {
+      if (!currentEvent) return;
+      const tickets = buildTickets(currentEvent);
+      const cart = getCart();
+
+      let added = 0;
+      tickets.forEach(t => {
+        const qty = ticketSelections[t.id] || 0;
+        if (qty === 0) return;
+        added += qty;
+        const existing = cart.find(i => i.ticketId === t.id && i.eventId === currentEvent.id);
+        if (existing) {
+          existing.qty = Math.min(existing.qty + qty, 10);
+        } else {
+          cart.push({
+            eventId:   currentEvent.id,
+            eventName: currentEvent.name,
+            eventDate: currentEvent.date,
+            eventCity: currentEvent.city,
+            ticketId:  t.id,
+            ticketName: t.name,
+            levels:     t.levels,
+            price:      t.price,
+            qty
+          });
+        }
+      });
+
+      saveCart(cart);
+      closeModal();
+      showToast(`${added} ticket${added > 1 ? 's' : ''} ajouté${added > 1 ? 's' : ''} au panier !`, 'success');
+    }
+
+    async function payNow() {
+      if (!currentEvent || !currentUser) return;
+
+      const btnPay = document.getElementById('btnPayNow');
+      const btnCart = document.getElementById('btnAddCart');
+      btnPay.disabled = true;
+      btnCart.disabled = true;
+      btnPay.innerHTML = `<svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Enregistrement…`;
+
+      const tickets = buildTickets(currentEvent);
+      const rows = [];
+
+      tickets.forEach(t => {
+        const qty = ticketSelections[t.id] || 0;
+        if (qty === 0) return;
+        rows.push({
+          athlete_id:    currentUser.id,
+          event_id:      currentEvent.id,
+          ticket_id:     t.id,
+          ticket_name:   t.name,
+          ticket_format: t.format || null,
+          ticket_levels: t.levels || [],
+          qty,
+          unit_price:    t.price,
+          status:        'confirmed'  // confirmé directement (paiement en ligne à intégrer)
+        });
+      });
+
+      if (rows.length === 0) {
+        btnPay.disabled = false;
+        btnCart.disabled = false;
+        btnPay.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg> Payer maintenant`;
+        return;
+      }
+
+      const { error } = await sb.from('registrations').insert(rows);
+
+      if (error) {
+        console.error('Registration error:', error);
+        btnPay.disabled = false;
+        btnCart.disabled = false;
+        btnPay.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg> Payer maintenant`;
+        showToast("Erreur lors de l'inscription. Veuillez réessayer.", 'error');
+        return;
+      }
+
+      const totalTickets = rows.reduce((s, r) => s + r.qty, 0);
+      addToCart();   // aussi en localStorage pour le badge panier
+      closeModal();
+      showToast(`Inscription confirmée — ${totalTickets} ticket${totalTickets > 1 ? 's' : ''} enregistré${totalTickets > 1 ? 's' : ''} !`, 'success');
+    }
+
+    function initCartBadge() {
+      updateCartBadge();
+    }
+
+    function updateCartBadge() {
+      const cart = getCart();
+      const totalQty = cart.reduce((sum, i) => sum + (i.qty || 0), 0);
+      document.querySelectorAll('.navbar-icon[aria-label="Panier"]').forEach(btn => {
+        let badge = btn.querySelector('.cart-badge');
+        if (totalQty > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'cart-badge';
+            btn.appendChild(badge);
+          }
+          badge.textContent = totalQty > 99 ? '99+' : totalQty;
+        } else if (badge) {
+          badge.remove();
+        }
+      });
+    }
+
+    // =============================================
+    //  TOAST
+    // =============================================
+
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast${type === 'error' ? ' error' : ''}`;
+
+      const icon = type === 'error'
+        ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`
+        : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+      toast.innerHTML = `${icon}<span>${escHtml(msg)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = '0.3s ease'; setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const eventData = await loadEvent();
-      if (eventData) initTabs(eventData);
+      if (eventData) {
+        initTabs(eventData);
+        initCartBadge();
+
+      }
     });
   </script>
 

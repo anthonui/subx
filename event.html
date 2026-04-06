@@ -1316,7 +1316,14 @@
         </div>
       `;
 
-      window._subxEvent = e;
+      // Charger les tickets depuis ticket_type
+      const { data: tickets } = await sb
+        .from('ticket_type')
+        .select('id, format, level, price, max_spots')
+        .eq('event_id', e.id)
+        .order('price', { ascending: true });
+      window._subxEvent   = e;
+      window._subxTickets = tickets || [];
       return e;
     }
 
@@ -1406,62 +1413,41 @@
     };
 
     function buildTickets(e) {
-      // Build ticket options from formats × levels with prices
-      const formats  = (e.formats  || []).map(f => String(f).toLowerCase());
-      const levels   = (e.level    || []).map(l => String(l).toLowerCase());
-      const prices   = e.prices    || {};  // JSONB: { "solo": 45, "duo": 35, … } or nested
+      // Priorité : tickets depuis la table ticket_type (créés par l'organisateur)
+      const ticketTypes = window._subxTickets || [];
 
-      const tickets = [];
-
-      if (formats.length === 0) {
-        // Fallback: single ticket from price_from
-        tickets.push({
-          id: 'default',
-          name: 'Inscription Standard',
-          format: null,
-          levels: levels,
-          price: parseFloat(e.price_from) || 0,
-          places: e.max_participants || null,
+      if (ticketTypes.length > 0) {
+        return ticketTypes.map(t => ({
+          id:      t.id,
+          name:    t.format,
+          format:  t.format,
+          levels:  t.level ? [t.level] : [],
+          price:   parseFloat(t.price) || 0,
+          places:  t.max_spots || null,
           soldOut: false
-        });
-        return tickets;
+        }));
       }
 
-      formats.forEach(fmt => {
-        // Try to find price: prices[fmt], prices[fmt.capitalize()], or price_from
-        const fmtKey = fmt;
-        const fmtKeyCapital = fmt.charAt(0).toUpperCase() + fmt.slice(1);
-        let price = prices[fmtKey] ?? prices[fmtKeyCapital] ?? prices[fmt.toUpperCase()] ?? parseFloat(e.price_from) ?? 0;
+      // Fallback : lire e.formats / e.prices si pas de ticket_type en base
+      const formats = (e.formats || []);
+      const levels  = (e.level   || []).map(l => String(l).toLowerCase());
+      const prices  = e.prices   || {};
+
+      if (formats.length === 0) {
+        return [{
+          id: 'default', name: 'Inscription Standard', format: null,
+          levels, price: parseFloat(e.price_from) || 0,
+          places: e.max_participants || null, soldOut: false
+        }];
+      }
+
+      return formats.map(fmt => {
+        const key = String(fmt).toLowerCase();
+        const cap = fmt.charAt(0).toUpperCase() + fmt.slice(1);
+        let price = prices[fmt] ?? prices[key] ?? prices[cap] ?? parseFloat(e.price_from) ?? 0;
         price = parseFloat(price) || 0;
-
-        // If price is an object (nested per level), create one ticket per level
-        if (typeof prices[fmtKey] === 'object' && prices[fmtKey] !== null && !Array.isArray(prices[fmtKey])) {
-          const nested = prices[fmtKey];
-          Object.entries(nested).forEach(([lvl, p]) => {
-            tickets.push({
-              id: `${fmt}_${lvl}`,
-              name: fmtKeyCapital,
-              format: fmt,
-              levels: [lvl],
-              price: parseFloat(p) || 0,
-              places: null,
-              soldOut: false
-            });
-          });
-        } else {
-          tickets.push({
-            id: fmt,
-            name: fmtKeyCapital,
-            format: fmt,
-            levels: levels.length > 0 ? levels : [],
-            price,
-            places: null,
-            soldOut: false
-          });
-        }
+        return { id: key, name: fmt, format: key, levels, price, places: null, soldOut: false };
       });
-
-      return tickets;
     }
 
     function renderTickets(tickets) {
@@ -1639,13 +1625,13 @@
         rows.push({
           athlete_id:    currentUser.id,
           event_id:      currentEvent.id,
-          ticket_id:     t.id,
+          ticket_id:     String(t.id),
           ticket_name:   t.name,
           ticket_format: t.format || null,
           ticket_levels: t.levels || [],
           qty,
           unit_price:    t.price,
-          status:        'confirmed'  // confirmé directement (paiement en ligne à intégrer)
+          status:        'confirmed'
         });
       });
 

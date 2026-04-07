@@ -1655,12 +1655,12 @@
     let allEvents = [];
 
     const FORMAT_ABBR = {
-      'Solo Homme':    { label: 'SOLO',    green: true  },
-      'Solo Femme':    { label: 'SOLO',    green: true  },
-      'Double Hommes': { label: 'DBL H',   green: false },
-      'Double Femme':  { label: 'DBL F',   green: false },
-      'Double Mixte':  { label: 'DBL MX',  green: false },
-      'Relais':        { label: 'RELAIS',  green: false },
+      'Solo Homme':    { label: 'SOLO',   green: true  },
+      'Solo Femme':    { label: 'SOLO',   green: true  },
+      'Double Hommes': { label: 'TEAM H', green: false },
+      'Double Femme':  { label: 'TEAM F', green: false },
+      'Double Mixte':  { label: 'TEAM H/F', green: false },
+      'Relais':        { label: 'RELAIS', green: false },
     };
 
     function buildFormatTags(ticketTypes) {

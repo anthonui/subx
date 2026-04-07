@@ -1677,7 +1677,7 @@
           </div>
           <div class="event-card-body">
             <div class="event-tags">
-              ${(e.formats || []).map(t => `<span class="tag ${greenTags.includes(t) ? 'tag--green' : 'tag--dark'}">${t}</span>`).join('')}
+              ${[...new Set((e.ticket_type || []).map(tt => tt.format).filter(Boolean))].map(t => `<span class="tag ${greenTags.includes(t) ? 'tag--green' : 'tag--dark'}">${t}</span>`).join('') || (e.formats || []).map(t => `<span class="tag ${greenTags.includes(t) ? 'tag--green' : 'tag--dark'}">${t}</span>`).join('')}
             </div>
             <div class="event-meta">
               <p class="event-date">
@@ -1727,16 +1727,18 @@
 
       const { data, error } = await sb
         .from('event')
-        .select('*')
+        .select('*, ticket_type(format)')
         .eq('published', true)
         .order('date', { ascending: true });
 
+      console.log('SUBX query error:', error, 'data:', data);
       if (error || !data || !data.length) {
         grid.innerHTML = '<p style="color:var(--gray);text-align:center;grid-column:1/-1">Aucun événement disponible pour le moment.</p>';
         return;
       }
 
       allEvents = data;
+      console.log('SUBX events data:', JSON.stringify(data[0]?.ticket_type));
       renderEventCards(data);
     }
 
